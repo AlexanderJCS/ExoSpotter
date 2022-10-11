@@ -10,7 +10,7 @@ An example of data would look like this:
 0.999941499,2457801.21
 ```
 
-Where the left column is the precieved brightness percent and the right column is the Julian date.
+Where the left column is the normalized flux (the precieved brightness percent) and the right column is the Julian date.
 
 ## Using this library in your own project
 
