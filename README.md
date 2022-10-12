@@ -1,5 +1,5 @@
 # exoplanet-finder
-C++ library to find exoplanets given the percieved brightness of a star and the Julian date of that datapoint
+C++ library to find exoplanets given the percieved brightness percentage (normalized flux) of a star and the Julian date of that datapoint.
 
 An example of data would look like this:
 
