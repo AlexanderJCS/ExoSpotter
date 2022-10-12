@@ -4,6 +4,7 @@ C++ library to find exoplanets given the percieved brightness percentage (normal
 An example of data would look like this:
 
 ```
+flux,date
 0.999949689,2457801.085
 0.999966108,2457801.126
 0.999950989,2457801.168
