@@ -14,6 +14,7 @@ Where the left column is the normalized flux (the precieved brightness percent) 
 
 ## Table of Contents
 
+```
 0. exoplanet-finder (info about this project)
 1. Where to get data
 2. Using this library in your own project
@@ -24,6 +25,7 @@ Where the left column is the normalized flux (the precieved brightness percent) 
     a. Test tools
     b. Issues
     c. Pull requests
+````
 
 ## Where to get data
 
