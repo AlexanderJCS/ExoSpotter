@@ -52,7 +52,7 @@ namespace DetectExoplanets
 		/*
 		Calls other methods necessary to find planets
 		*/
-		std::vector<float> findPlanets();
+		std::vector<float> findPlanets(bool verbose = false);
 
 		/*
 		data: The data from the observed star's brightness. It will have two key values of "flux" and "date".

@@ -1,6 +1,5 @@
 #include <unordered_map>
 #include <iostream>
-#include <iomanip>
 #include <vector>
 #include <string>
 
@@ -18,8 +17,6 @@ std::unordered_map<std::string, std::vector<float>> DetectExoplanets::FindPlanet
 	}
 
 	std::unordered_map<std::string, std::vector<float>> returnValue;
-	returnValue["flux"] = {};
-	returnValue["date"] = {};
 
 	for (int i = 0; i < flux.size(); i++) {
 		if (flux[i] <= potentialPlanetThreshold) {
@@ -55,8 +52,8 @@ std::unordered_map<std::string, std::vector<float>> DetectExoplanets::FindPlanet
 				returnValue["date"].push_back(peakFluxDate);
 			}
 
-			peakFlux = 2;
-			peakFluxDate = 0;
+			peakFlux = data["flux"][i];
+			peakFluxDate = data["date"][i];
 			startDate = data["date"][i];
 		}
 
@@ -64,6 +61,12 @@ std::unordered_map<std::string, std::vector<float>> DetectExoplanets::FindPlanet
 			peakFlux = data["flux"][i];
 			peakFluxDate = data["date"][i];
 		}
+	}
+
+	// If the values are not the default values
+	if (!(peakFlux == 2 && peakFluxDate == 0)) {
+		returnValue["flux"].push_back(peakFlux);
+		returnValue["date"].push_back(peakFluxDate);
 	}
 
 	return returnValue;
@@ -133,7 +136,7 @@ bool DetectExoplanets::FindPlanet::planetInData(std::vector<float> data)
 /*
 Calls other methods necessary to find planets
 */
-std::vector<float> DetectExoplanets::FindPlanet::findPlanets()
+std::vector<float> DetectExoplanets::FindPlanet::findPlanets(bool verbose)
 {
 	auto candidates = findPlanetCandidates();
 	auto grouped = groupDatapoints(candidates);
@@ -145,6 +148,37 @@ std::vector<float> DetectExoplanets::FindPlanet::findPlanets()
 		if (planetInData(group["date"])) {
 			planetFluxes.push_back(group["flux"][0]);
 		}
+	}
+	
+	// Print additional info if verbose is enabled, mainly used for debugging
+	if (verbose) {
+		std::cout << "*** Candidates ***\n\n";
+
+		for (int i = 0; i < candidates["flux"].size(); i++) {
+			std::cout << candidates["flux"][i] << "," << candidates["date"][i] << "\n";
+		}
+
+		std::cout << "\n\n*** Grouped ***\n\n";
+
+		for (int i = 0; i < grouped["flux"].size(); i++) {
+			std::cout << grouped["flux"][i] << "," << grouped["date"][i] << "\n";
+		}
+
+		for (int i = 0; i < splitted.size(); i++) {
+			std::cout << "\n\n*** SPLIT GROUP " << i << " ***\n\n";
+
+			for (int j = 0; j < splitted[i]["flux"].size(); j++) {
+				std::cout << splitted[i]["flux"][j] << "," << splitted[i]["date"][j] << "\n";
+			}
+		}
+
+		std::cout << "\n\n*** Planet Fluxes *** \n\n";
+
+		for (auto flux : planetFluxes) {
+			std::cout << flux << "\n";
+		}
+
+		std::cout << "\n\n";
 	}
 
 	return planetFluxes;

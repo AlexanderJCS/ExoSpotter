@@ -12,11 +12,10 @@ using namespace std::chrono;
 
 int main()
 {
-
-	DetectExoplanets::FindPlanet planetFinder{ readData("data.csv"), 0.9999, 0.002, 1.5, 0.4 };
+	DetectExoplanets::FindPlanet planetFinder{ readData("test/data.csv"), 0.9999, 0.002, 1.5, 0.4 };
 	
 	auto start = high_resolution_clock::now();
-	auto planetFluxes = planetFinder.findPlanets();
+	auto planetFluxes = planetFinder.findPlanets(true);
 	auto stop = high_resolution_clock::now();
 
 	for (auto& flux : planetFluxes) {
@@ -24,5 +23,5 @@ int main()
 	}
 
 	auto duration = duration_cast<milliseconds>(stop - start);
-	std::cout << "\nCompleted in " << duration.count() << " milliseconds\n";
+	std::cout << "\nCompleted in " << duration.count() << " ms\n";
 }
