@@ -15,7 +15,7 @@ int main()
 	DetectExoplanets::FindPlanet planetFinder{ readData("test/data.csv"), 0.9999, 0.002, 1.5, 0.4 };
 	
 	auto start = high_resolution_clock::now();
-	auto planetFluxes = planetFinder.findPlanets(true);
+	auto planetFluxes = planetFinder.findPlanets(false);
 	auto stop = high_resolution_clock::now();
 
 	for (auto& flux : planetFluxes) {

@@ -1,8 +1,10 @@
 #include <unordered_map>
 #include <iostream>
 #include <fstream>
+#include <ctype.h>
 #include <vector>
 #include <string>
+
 
 
 /*
@@ -24,11 +26,25 @@ std::unordered_map<std::string, std::vector<float>> readData(std::string filenam
 	while (file) {
 		file >> line;
 
+		// If there is a non-number in the string other than comma, skip the line
+		bool skipLine = false;
+		
+		for (char chr : line) {
+			if (chr != ',' && chr != '.' && !isdigit(chr)) {
+				skipLine = true;
+				break;
+			}
+		}
+
+		if (skipLine) {
+			continue;
+		}
+
 		// Separate the line by comma
 		auto commaIndex = line.find(',');
 		
 		if (commaIndex == std::string::npos) {
-			std::cout << "Error with data with the line " << line << ".";
+			std::cout << "Error with data with the line " << line << ". No seperator (,) found.";
 			exit(1);
 		}
 
