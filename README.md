@@ -12,6 +12,23 @@ An example of data would look like this:
 
 Where the left column is the normalized flux (the precieved brightness percent) and the right column is the Julian date. The date doesn't need to be the Julian date exactly, but it does need to have 1 equal to 1 Earth day.
 
+## Table of Contents
+
+0. exoplanet-finder (info about this project)
+1. Where to get data
+2. Using this library in your own project
+    a. Using parseData.h to parse data
+    b. Creating the FindPlanet class
+    c. Finding exoplanets!
+3. Contributing
+    a. Test tools
+    b. Issues
+    c. Pull requests
+
+## Where to get data
+
+Coming soon when I have more info.
+
 ## Using this library in your own project
 
 To use this library in your own project, you first need to load the data into a `std::unordered_map<std::string, std::vector<double>>` data type. The unordered map will have two keys: `flux` and `date`. The `flux` is the percent percieved brightness of the star, and the `date` is the Julian date (or any other date format where 1 = 1 day) of that datapoint. If your data looks like exactly like the example above, you may use the `parseData.h` file to parse the data in the format for the program. 
@@ -42,7 +59,7 @@ In the output, we will get this unordered map:
 This is the correct format for the following steps.
 
 
-## Creating the FindPlanet class
+### Creating the FindPlanet class
 
 To create the FindPlanet class, we need to pass in the five required input variables:
 `data`: The data aquired using the last step in this readme
@@ -65,7 +82,7 @@ int main()
 }
 ```
 
-## Finding exoplanets!
+### Finding exoplanets!
 
 The final step is to call a method in the `FindPlanet` class to find exoplanets. The `findPlanets()` method returns a `std::vector<double>` where the `double` is the flux of the planet it detected.
 
