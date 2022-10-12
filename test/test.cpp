@@ -4,8 +4,8 @@
 #include <string>
 #include <chrono>
 
-#include "parseData.h"
-#include "detect_exoplanets.h"
+#include "../include/exoplanetFinder/detect_exoplanets.h"
+#include "../include/exoplanetFinder/parseData.h"
 
 using namespace std::chrono;
 
