@@ -10,7 +10,7 @@ An example of data would look like this:
 0.999941499,2457801.21
 ```
 
-Where the left column is the normalized flux (the precieved brightness percent) and the right column is the Julian date.
+Where the left column is the normalized flux (the precieved brightness percent) and the right column is the Julian date. The date doesn't need to be the Julian date exactly, but it does need to have 1 equal to 1 Earth day.
 
 ## Using this library in your own project
 
@@ -65,7 +65,7 @@ int main()
 }
 ```
 
-## Finally: finding exoplanets!
+## Finding exoplanets!
 
 The final step is to call a method in the `FindPlanet` class to find exoplanets. The `findPlanets()` method returns a `std::vector<double>` where the `double` is the flux of the planet it detected.
 
@@ -83,7 +83,7 @@ int main()
     std::unordered_map<std::string, std::vector<float>> data = ...  // define the data, read the previous section for more info
     DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.002, 1.5, 0.4 };
     
-    // New code
+    // Get the planet fluxes
     std::vector<double> planetFluxes = planetFinder.findPlanets();
     
     // Output the planet fluxes to the console
@@ -97,9 +97,14 @@ int main()
 
 ### Test tools
 
+More info on this section coming soon. I need to get test data
 
 ### Issues
 
+Suggestions are welcome in the issues section.
+
+For bugs, please state what the issue is, the data you used (if you can share it that would be great), and the code you created that has the issue.
 
 ### Pull requests
 
+For minor changes, please submit a pull request and state what you changed. For major changes, please create an issue to discuss the change before creating a pull request.
