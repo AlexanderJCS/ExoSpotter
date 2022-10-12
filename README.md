@@ -55,7 +55,7 @@ Using this information, we can create the planet class:
 ```cpp
 #include <unordered_map>
 
-#include "include/detect_exoplanets.h"
+#include "include/exoplanetFinder/detect_exoplanets.h"
 
 int main()
 {
@@ -75,7 +75,7 @@ Here is some example code:
 #include <iostream>
 #include <vector>
 
-#include "include/detect_exoplanets.h"
+#include "include/exoplanetFinder/detect_exoplanets.h"
 
 int main()
 {
