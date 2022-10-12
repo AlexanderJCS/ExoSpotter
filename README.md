@@ -88,6 +88,8 @@ int main()
 
 The final step is to call a method in the `FindPlanet` class to find exoplanets. The `findPlanets()` method returns a `std::vector<double>` where the `double` is the flux of the planet it detected.
 
+This method has an optional boolean parameter `verbose` mainly used for debugging. This is not recommended for production code. 
+
 Here is some example code:
 ```cpp
 #include <unordered_map>
