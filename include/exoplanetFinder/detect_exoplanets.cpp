@@ -1,4 +1,5 @@
 #include <unordered_map>
+#include <algorithm>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -109,16 +110,16 @@ std::vector<std::unordered_map<std::string, std::vector<float>>> DetectExoplanet
 }
 
 /*
-Returns if there is at least one planet in the data given.
+Returns -1 if a planet is not found. Otherwise returns the Julian date of the first transit.
 
 WARNING: This algorithm may give a false negative when two planets are in the same dataset.
 			This would happen if two planets are similar size, it wouldn't get
 			picked up by the grouping algorithm.
 */
-bool DetectExoplanets::FindPlanet::planetInData(std::vector<float> data)
+float DetectExoplanets::FindPlanet::planetInData(std::vector<float> data)
 {
 	if (data.size() < 3) {
-		return false;  // not enough datapoints
+		return -1;  // not enough datapoints
 	}
 
 	for (int i = 0; i < data.size() - 2; i++) {
@@ -126,11 +127,27 @@ bool DetectExoplanets::FindPlanet::planetInData(std::vector<float> data)
 		float gap2 = data[i + 2] - data[i + 1];
 
 		if (abs(gap2 - gap1) < TTVRange) {
-			return true;
+			return data[i];
 		}
 	}
 
-	return false;
+	return -1;
+}
+
+/*
+Uses binary search to find the date index
+*/
+int DetectExoplanets::FindPlanet::findDateIndex(std::vector<float> data, float target)
+{
+	auto lowerBoundIt = std::lower_bound(data.begin(), data.end(), target);
+	
+	if (lowerBoundIt == data.end() || *lowerBoundIt != target) {
+		return -1;
+	}
+	
+	else {
+		return std::distance(data.begin(), lowerBoundIt);
+	}
 }
 
 /*
@@ -145,8 +162,20 @@ std::vector<float> DetectExoplanets::FindPlanet::findPlanets(bool verbose)
 	std::vector<float> planetFluxes;
 
 	for (auto& group : splitted) {
-		if (planetInData(group["date"])) {
-			planetFluxes.push_back(group["flux"][0]);
+		float date = planetInData(group["date"]);
+
+		if (date != -1) {
+			int index = findDateIndex(group["date"], date);
+
+			// If the item is found
+			if (index != -1) {
+				planetFluxes.push_back(group["flux"][index]);
+			}
+			
+			// Else, resort by putting the first item in the group
+			else {
+				planetFluxes.push_back(group["flux"][0]);
+			}
 		}
 	}
 	
@@ -178,7 +207,7 @@ std::vector<float> DetectExoplanets::FindPlanet::findPlanets(bool verbose)
 			std::cout << flux << "\n";
 		}
 
-		std::cout << "\n\n";
+		std::cout << "\n";
 	}
 
 	return planetFluxes;

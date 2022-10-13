@@ -40,13 +40,18 @@ namespace DetectExoplanets
 			std::unordered_map<std::string, std::vector<float>> data);
 
 		/*
+		Finds the index of a specific Julian date using binary search. Returns -1 if not found.
+		*/
+		int findDateIndex(std::vector<float> data, float target);
+
+		/*
 		Returns if there is at least one planet in the data given.
 
 		WARNING: This algorithm may give a false negative when two planets are in the same dataset.
 				 This would happen if two planets are similar size, it wouldn't get
 				 picked up by the grouping algorithm.
 		*/
-		bool planetInData(std::vector<float> data);
+		float planetInData(std::vector<float> data);
 
 	public:
 		/*
