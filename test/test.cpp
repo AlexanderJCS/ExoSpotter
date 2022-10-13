@@ -10,19 +10,6 @@
 using namespace std::chrono;
 
 
-int binSearch(std::vector<int> data, int target) {
-	auto lowerBoundIt = std::lower_bound(data.begin(), data.end(), target);
-
-	if (lowerBoundIt == data.end() || *lowerBoundIt != target) {
-		return -1;
-	}
-
-	else {
-		return std::distance(data.begin(), lowerBoundIt);
-	}
-}
-
-
 int main()
 {
 	DetectExoplanets::FindPlanet planetFinder{ readData("test/data.csv"), 0.9999, 0.002, 1.5, 0.4 };
