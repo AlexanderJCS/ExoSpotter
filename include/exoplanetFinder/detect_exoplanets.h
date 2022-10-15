@@ -53,11 +53,25 @@ namespace DetectExoplanets
 		*/
 		float planetInData(std::vector<float> data);
 
+		/*
+		Returns -1 if a planet is not found. Otherwise returns the date
+		of the flux of the of the planet found.
+
+		This method is to provide a more sophisticated algorithm which counteracts the
+		warning in the planetInData method, at the cost of time.
+		*/
+		float planetInDataPrecise(std::vector<float> data);
+
 	public:
 		/*
 		Calls other methods necessary to find planets
 		*/
 		std::vector<float> findPlanets(bool verbose = false);
+
+		/*
+		Uses a different algorithm to find more exoplanets at the expense of time
+		*/
+		std::vector<float> findPlanetsPrecise(bool verbose = false);
 
 		/*
 		data: The data from the observed star's brightness. It will have two key values of "flux" and "date".

@@ -18,10 +18,25 @@ int main()
 	auto planetFluxes = planetFinder.findPlanets(false);
 	auto stop = high_resolution_clock::now();
 
+	std::cout << "*** FAST ALGORITHM ***\n";
+
 	for (auto& flux : planetFluxes) {
 		std::cout << "Planet identified with flux: " << flux << "\n";
 	}
 
 	auto duration = duration_cast<milliseconds>(stop - start);
+	std::cout << "\nCompleted in " << duration.count() << " ms\n";
+
+	start = high_resolution_clock::now();
+	planetFluxes = planetFinder.findPlanetsPrecise(false);
+	stop = high_resolution_clock::now();
+
+	std::cout << "\n *** PRECISE ALGORITHM ***\n";
+
+	for (auto& flux : planetFluxes) {
+		std::cout << "Planet identified with flux: " << flux << "\n";
+	}
+
+	duration = duration_cast<milliseconds>(stop - start);
 	std::cout << "\nCompleted in " << duration.count() << " ms\n";
 }

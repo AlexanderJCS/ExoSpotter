@@ -135,6 +135,47 @@ float DetectExoplanets::FindPlanet::planetInData(std::vector<float> data)
 }
 
 /*
+Returns -1 if a planet is not found. Otherwise returns the date
+of the flux of the of the planet found.
+
+This method is to provide a more sophisticated algorithm which counteracts the
+warning in the planetInData method, at the cost of time.
+*/
+float DetectExoplanets::FindPlanet::planetInDataPrecise(std::vector<float> data)
+{
+	std::vector<float> returnVector;  // periods of the planets
+
+	for (int i = 0; i < data.size(); i++) {
+		for (int j = i + 1; j < data.size(); j++) {
+			float period = data[j] - data[i];
+
+			float closest = data[j];
+			int closestIndex = j;
+			float nextExpectedTransit = data[j] + period;
+			float lastDiff = abs(closest - nextExpectedTransit);
+
+			// Find the datapoint closest to the next expected transit
+			for (int k = j; k < data.size(); k++) {
+
+				if (abs(data[k] - nextExpectedTransit) > lastDiff) {
+					break;
+				}
+
+				lastDiff = abs(data[k] - nextExpectedTransit);
+				closestIndex = k;
+				closest = data[k];
+			}
+
+			if (abs(nextExpectedTransit - closest) < TTVRange) {
+				return data[i];
+			}
+		}
+	}
+
+	return -1;
+}
+
+/*
 Uses binary search to find the date index
 */
 int DetectExoplanets::FindPlanet::findDateIndex(std::vector<float> data, float target)
@@ -208,6 +249,28 @@ std::vector<float> DetectExoplanets::FindPlanet::findPlanets(bool verbose)
 		}
 
 		std::cout << "\n";
+	}
+
+	return planetFluxes;
+}
+
+/*
+Uses a different algorithm to find more exoplanets at the expense of time
+*/
+std::vector<float> DetectExoplanets::FindPlanet::findPlanetsPrecise(bool verbose)
+{
+	auto candidates = findPlanetCandidates();
+	auto grouped = groupDatapoints(candidates);
+	auto splitted = splitDatapoints(grouped);
+
+	std::vector<float> planetFluxes;
+
+	for (auto splitData : splitted) {
+		float planetFlux = planetInDataPrecise(splitData["date"]);
+
+		if (planetFlux != -1) {
+			planetFluxes.push_back(splitData["flux"][findDateIndex(splitData["date"], planetFlux)]);
+		}
 	}
 
 	return planetFluxes;
