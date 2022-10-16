@@ -4,7 +4,7 @@ C++ library to find exoplanets given the percieved brightness percentage (normal
 An example of data would look like this:
 
 ```
-flux,date
+flux,julian_date
 0.999949689,2457801.085
 0.999966108,2457801.126
 0.999950989,2457801.168
@@ -17,24 +17,34 @@ Where the left column is the normalized flux (the precieved brightness percent) 
 
 ```
 0. exoplanet-finder (info about this project)
-1. Using this library in your own project
+1. Converting .fits data to .csv data
+2. Using this library in your own project
     a. Using parseData.h to parse data
     b. Creating the FindPlanet class
     c. What is the Exoplanet struct?
     d. Finding exoplanets!
-2. Contributing
+3. Contributing
     a. Test tools
     b. Issues
     c. Pull requests
 ````
 
-## Using this library in your own project
+# Converting .fits data to .csv data
+
+First, make sure that Python 3.10 is installed on your machine as well as astropy version 3.0.4 or greater. You can install astropy by performing the command:
+```
+$ pip install astropy
+```
+
+To convert lightcurve data in the style of Flexible Image Transport System (fits) data to .csv data, which can be read by the program, navigate to tools/fits_to_csv. Then, move your fits data to the same directory as the Python file. Finally, run the file and provide it all the information that is needed. If you are not sure if your flux data is normalized, assume that it isn't. The output of this program will be a file named `data.csv`, which can be fed into `parseData.h`.
+
+# Using this library in your own project
 
 To use this library in your own project, you first need to load the data into a `std::unordered_map<std::string, std::vector<double>>` data type. The unordered map will have two keys: `flux` and `date`. The `flux` is the percent percieved brightness of the star, and the `date` is the Julian date (or any other date format where 1 = 1 day) of that datapoint. If your data looks like exactly like the example above, you may use the `parseData.h` file to parse the data in the format for the program. 
 
 ## Using parseData.h to parse data
 
-Using the parseData header makes it simple to get the data from a csv into the correct format, assuming that your data looks exactly like the example above with the flux to the left and the Julian date to the right.
+Using the parseData header makes it simple to get the data from a csv into the correct format, assuming that your data looks like the example above with the flux to the left and the Julian date to the right. You can get the data into this format by reviewing the `Converting .fits data to .csv data` section.
 
 By using `parseData.h`, we can write the following code:
 ```cpp
