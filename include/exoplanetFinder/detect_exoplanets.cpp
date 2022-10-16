@@ -6,9 +6,27 @@
 
 #include "detect_exoplanets.h"
 
+
+DetectExoplanets::Exoplanet::Exoplanet() { };  // called if there is no planet identified
+
+
+DetectExoplanets::Exoplanet::Exoplanet(float firstTransitDate, float flux, float period)
+{
+	isPlanet = true;
+	this->firstTransitDate = firstTransitDate;
+	this->flux = flux;
+	this->period = period;
+}
+
+std::ostream& DetectExoplanets::operator<<(std::ostream& strm, const DetectExoplanets::Exoplanet& exoplanet) {
+	return strm << "First observed transit date: " << exoplanet.firstTransitDate <<
+				   "\nFirst observed flux: " << exoplanet.flux <<
+				   "\nPeriod: " << exoplanet.period << " days\n";
+}
+
 /*
 Filters through the data to find datapoints under
-	the value potentialPlanetThreshold
+the value potentialPlanetThreshold
 */
 std::unordered_map<std::string, std::vector<float>> DetectExoplanets::FindPlanet::findPlanetCandidates()
 {
@@ -113,110 +131,83 @@ std::vector<std::unordered_map<std::string, std::vector<float>>> DetectExoplanet
 Returns -1 if a planet is not found. Otherwise returns the Julian date of the first transit.
 
 WARNING: This algorithm may give a false negative when two planets are in the same dataset.
-			This would happen if two planets are similar size, it wouldn't get
-			picked up by the grouping algorithm.
+		 This would happen if two planets are similar size, it wouldn't get
+		 picked up by the grouping algorithm.
 */
-float DetectExoplanets::FindPlanet::planetInData(std::vector<float> data)
+DetectExoplanets::Exoplanet DetectExoplanets::FindPlanet::planetInData(std::unordered_map<std::string, std::vector<float>> data)
 {
-	if (data.size() < 3) {
-		return -1;  // not enough datapoints
+	if (data["flux"].size() < 3) {
+		return Exoplanet{};  // not enough datapoints
 	}
 
-	for (int i = 0; i < data.size() - 2; i++) {
-		float gap1 = data[i + 1] - data[i];
-		float gap2 = data[i + 2] - data[i + 1];
+	for (int i = 0; i < data["date"].size() - 2; i++) {
+		float transitTime1 = data["date"][i + 1] - data["date"][i];
+		float transitTime2 = data["date"][i + 2] - data["date"][i + 1];
 
-		if (abs(gap2 - gap1) < TTVRange) {
-			return data[i];
+		if (abs(transitTime2 - transitTime1) < TTVRange) {
+			return Exoplanet{ data["date"][i], data["flux"][i], (transitTime1 + transitTime2) / 2 };
 		}
 	}
 
-	return -1;
+	return Exoplanet{};
 }
 
 /*
-Returns -1 if a planet is not found. Otherwise returns the date
-of the flux of the of the planet found.
-
 This method is to provide a more sophisticated algorithm which counteracts the
 warning in the planetInData method, at the cost of time.
 */
-float DetectExoplanets::FindPlanet::planetInDataPrecise(std::vector<float> data)
+DetectExoplanets::Exoplanet DetectExoplanets::FindPlanet::planetInDataPrecise(std::unordered_map<std::string, std::vector<float>> data)
 {
-	std::vector<float> returnVector;  // periods of the planets
+	if (data["date"].size() < 3) {
+		return Exoplanet{};
+	}
 
-	for (int i = 0; i < data.size(); i++) {
-		for (int j = i + 1; j < data.size(); j++) {
-			float period = data[j] - data[i];
+	for (int i = 0; i < data["date"].size(); i++) {
+		for (int j = i + 1; j < data["date"].size(); j++) {
+			float period = data["date"][j] - data["date"][i];
 
-			float closest = data[j];
+			float closest = data["date"][j];
 			int closestIndex = j;
-			float nextExpectedTransit = data[j] + period;
+			float nextExpectedTransit = data["date"][j] + period;
 			float lastDiff = abs(closest - nextExpectedTransit);
 
 			// Find the datapoint closest to the next expected transit
-			for (int k = j; k < data.size(); k++) {
+			for (int k = j; k < data["date"].size(); k++) {
 
-				if (abs(data[k] - nextExpectedTransit) > lastDiff) {
+				if (abs(data["date"][k] - nextExpectedTransit) > lastDiff) {
 					break;
 				}
 
-				lastDiff = abs(data[k] - nextExpectedTransit);
+				lastDiff = abs(data["date"][k] - nextExpectedTransit);
 				closestIndex = k;
-				closest = data[k];
+				closest = data["date"][k];
 			}
 
 			if (abs(nextExpectedTransit - closest) < TTVRange) {
-				return data[i];
+				return Exoplanet{data["date"][i], data["flux"][i], period};
 			}
 		}
 	}
 
-	return -1;
-}
-
-/*
-Uses binary search to find the date index
-*/
-int DetectExoplanets::FindPlanet::findDateIndex(std::vector<float> data, float target)
-{
-	auto lowerBoundIt = std::lower_bound(data.begin(), data.end(), target);
-	
-	if (lowerBoundIt == data.end() || *lowerBoundIt != target) {
-		return -1;
-	}
-	
-	else {
-		return std::distance(data.begin(), lowerBoundIt);
-	}
+	return Exoplanet{};
 }
 
 /*
 Calls other methods necessary to find planets
 */
-std::vector<float> DetectExoplanets::FindPlanet::findPlanets(bool verbose)
+std::vector<DetectExoplanets::Exoplanet> DetectExoplanets::FindPlanet::findPlanets(bool verbose)
 {
 	auto candidates = findPlanetCandidates();
 	auto grouped = groupDatapoints(candidates);
 	auto splitted = splitDatapoints(grouped);
 
-	std::vector<float> planetFluxes;
+	std::vector<Exoplanet> planets;
 
 	for (auto& group : splitted) {
-		float date = planetInData(group["date"]);
+		Exoplanet planetInfo = planetInData(group);
 
-		if (date != -1) {
-			int index = findDateIndex(group["date"], date);
-
-			// If the item is found
-			if (index != -1) {
-				planetFluxes.push_back(group["flux"][index]);
-			}
-			
-			// Else, resort by putting the first item in the group
-			else {
-				planetFluxes.push_back(group["flux"][0]);
-			}
+		if (planetInfo.isPlanet) {
+			planets.push_back(planetInfo);
 		}
 	}
 	
@@ -244,36 +235,66 @@ std::vector<float> DetectExoplanets::FindPlanet::findPlanets(bool verbose)
 
 		std::cout << "\n\n*** Planet Fluxes *** \n\n";
 
-		for (auto flux : planetFluxes) {
-			std::cout << flux << "\n";
+		for (auto planet : planets) {
+			std::cout << planet << "\n";
 		}
 
 		std::cout << "\n";
 	}
 
-	return planetFluxes;
+	return planets;
 }
 
 /*
 Uses a different algorithm to find more exoplanets at the expense of time
 */
-std::vector<float> DetectExoplanets::FindPlanet::findPlanetsPrecise(bool verbose)
+std::vector<DetectExoplanets::Exoplanet> DetectExoplanets::FindPlanet::findPlanetsPrecise(bool verbose)
 {
 	auto candidates = findPlanetCandidates();
 	auto grouped = groupDatapoints(candidates);
 	auto splitted = splitDatapoints(grouped);
 
-	std::vector<float> planetFluxes;
+	std::vector<Exoplanet> planets;
 
 	for (auto splitData : splitted) {
-		float planetFlux = planetInDataPrecise(splitData["date"]);
+		Exoplanet planet = planetInDataPrecise(splitData);
 
-		if (planetFlux != -1) {
-			planetFluxes.push_back(splitData["flux"][findDateIndex(splitData["date"], planetFlux)]);
+		if (planet.isPlanet) {
+			planets.push_back(planet);
 		}
 	}
 
-	return planetFluxes;
+	if (verbose) {
+		std::cout << "*** Candidates ***\n\n";
+
+		for (int i = 0; i < candidates["flux"].size(); i++) {
+			std::cout << candidates["flux"][i] << "," << candidates["date"][i] << "\n";
+		}
+
+		std::cout << "\n\n*** Grouped ***\n\n";
+
+		for (int i = 0; i < grouped["flux"].size(); i++) {
+			std::cout << grouped["flux"][i] << "," << grouped["date"][i] << "\n";
+		}
+
+		for (int i = 0; i < splitted.size(); i++) {
+			std::cout << "\n\n*** SPLIT GROUP " << i << " ***\n\n";
+
+			for (int j = 0; j < splitted[i]["flux"].size(); j++) {
+				std::cout << splitted[i]["flux"][j] << "," << splitted[i]["date"][j] << "\n";
+			}
+		}
+
+		std::cout << "\n\n*** Planet Fluxes *** \n\n";
+
+		for (auto planet : planets) {
+			std::cout << planet << "\n";
+		}
+
+		std::cout << "\n";
+	}
+
+	return planets;
 }
 
 /*

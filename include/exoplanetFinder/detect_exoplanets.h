@@ -8,6 +8,19 @@
 
 namespace DetectExoplanets
 {
+	struct Exoplanet
+	{
+		bool isPlanet = false;
+		float firstTransitDate = 0;
+		float flux = 0;
+		float period = 0;
+
+		Exoplanet();  // used to return nothing if a planet is not identified
+		Exoplanet(float firstTransitDate, float flux, float period);
+
+		friend std::ostream& operator<<(std::ostream& strm, const DetectExoplanets::Exoplanet& exoplanet);
+	};
+
 	class FindPlanet
 	{
 		std::vector<float> flux;
@@ -40,18 +53,13 @@ namespace DetectExoplanets
 			std::unordered_map<std::string, std::vector<float>> data);
 
 		/*
-		Finds the index of a specific Julian date using binary search. Returns -1 if not found.
-		*/
-		int findDateIndex(std::vector<float> data, float target);
-
-		/*
-		Returns if there is at least one planet in the data given.
+		Returns a planet struct of the planet identified.
 
 		WARNING: This algorithm may give a false negative when two planets are in the same dataset.
 				 This would happen if two planets are similar size, it wouldn't get
 				 picked up by the grouping algorithm.
 		*/
-		float planetInData(std::vector<float> data);
+		Exoplanet planetInData(std::unordered_map<std::string, std::vector<float>> data);
 
 		/*
 		Returns -1 if a planet is not found. Otherwise returns the date
@@ -60,18 +68,18 @@ namespace DetectExoplanets
 		This method is to provide a more sophisticated algorithm which counteracts the
 		warning in the planetInData method, at the cost of time.
 		*/
-		float planetInDataPrecise(std::vector<float> data);
+		Exoplanet planetInDataPrecise(std::unordered_map<std::string, std::vector<float>> data);
 
 	public:
 		/*
 		Calls other methods necessary to find planets
 		*/
-		std::vector<float> findPlanets(bool verbose = false);
+		std::vector<Exoplanet> findPlanets(bool verbose);
 
 		/*
 		Uses a different algorithm to find more exoplanets at the expense of time
 		*/
-		std::vector<float> findPlanetsPrecise(bool verbose = false);
+		std::vector<Exoplanet> findPlanetsPrecise(bool verbose = false);
 
 		/*
 		data: The data from the observed star's brightness. It will have two key values of "flux" and "date".

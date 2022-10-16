@@ -12,29 +12,29 @@ using namespace std::chrono;
 
 int main()
 {
-	DetectExoplanets::FindPlanet planetFinder{ readData("test/data.csv"), 0.9999, 0.002, 1.5, 0.4 };
+	DetectExoplanets::FindPlanet planetFinder{ readData("test/data.csv"), 0.99995, 0.001, 1.5, 0.5 };
 	
 	auto start = high_resolution_clock::now();
-	auto planetFluxes = planetFinder.findPlanets(false);
+	auto planets = planetFinder.findPlanets(false);
 	auto stop = high_resolution_clock::now();
 
 	std::cout << "*** FAST ALGORITHM ***\n";
 
-	for (auto& flux : planetFluxes) {
-		std::cout << "Planet identified with flux: " << flux << "\n";
+	for (const auto& planet : planets) {
+		std::cout << "Planet identified with flux: " << planet << "\n";
 	}
 
 	auto duration = duration_cast<milliseconds>(stop - start);
 	std::cout << "\nCompleted in " << duration.count() << " ms\n";
 
 	start = high_resolution_clock::now();
-	planetFluxes = planetFinder.findPlanetsPrecise(false);
+	planets = planetFinder.findPlanetsPrecise(false);
 	stop = high_resolution_clock::now();
 
 	std::cout << "\n *** PRECISE ALGORITHM ***\n";
 
-	for (auto& flux : planetFluxes) {
-		std::cout << "Planet identified with flux: " << flux << "\n";
+	for (auto& planet : planets) {
+		std::cout << planet << "\n";
 	}
 
 	duration = duration_cast<milliseconds>(stop - start);

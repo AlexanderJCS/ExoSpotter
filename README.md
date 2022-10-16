@@ -20,7 +20,8 @@ Where the left column is the normalized flux (the precieved brightness percent) 
 1. Using this library in your own project
     a. Using parseData.h to parse data
     b. Creating the FindPlanet class
-    c. Finding exoplanets!
+    c. What is the Exoplanet struct?
+    d. Finding exoplanets!
 2. Contributing
     a. Test tools
     b. Issues
@@ -80,9 +81,21 @@ int main()
 }
 ```
 
+## What is the Exoplanet struct?
+
+The `DetectExoplanet::Exoplanet` struct has four variables:
+- `bool isPlanet`: If the Exoplanet is detected to be a planet or if it's just junk data. If you notice this value is `false` after running a method to get a list of exoplanets, please open an issue.
+- `float firstTransitDate` is the date first transit the algorithm detected in the data. 
+- `float flux` is the lowest value found for the transit at `firstTransitDate`.
+- `float period` is the orbital period of the exoplanet around its host star in days.
+
+The struct is primarily used as return type of the `findPlanets()` and `findPlanetsPrecise()` methods in the `FindPlanet` class.
+
+You can also `cout` this class and output its values to the console in a nice, formatted way by doing `std::cout << myExoplanetStruct`.
+
 ## Finding exoplanets!
 
-The final step is to call a method in the `FindPlanet` class to find exoplanets. The `findPlanets()` method returns a `std::vector<double>` where the `double` is the flux of the planet it detected.
+The final step is to call a method in the `FindPlanet` class to find exoplanets. The `findPlanets()` method returns `std::vector<DetectExoplanets::Exoplanet`.
 
 This method has an optional boolean parameter `verbose` mainly used for debugging. This is not recommended for production code. 
 
@@ -101,7 +114,7 @@ int main()
     DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.002, 1.5, 0.4 };
     
     // Get the planet fluxes
-    std::vector<double> planetFluxes = planetFinder.findPlanets();
+    std::vector<DetectExoplanets::Exoplanet> planetFluxes = planetFinder.findPlanets();
     
     // Output the planet fluxes to the console
     for (auto flux : planetFluxes) {
@@ -128,7 +141,7 @@ int main()
     DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.002, 1.5, 0.4 };
     
     // Get the planet fluxes
-    std::vector<double> planetFluxes = planetFinder.findPlanetsPrecise();
+    std::vector<DetectExoplanets::Exoplanet> planetFluxes = planetFinder.findPlanetsPrecise();
     
     // Output the planet fluxes to the console
     for (auto flux : planetFluxes) {
@@ -141,7 +154,7 @@ int main()
 
 ## Test tools
 
-Section coming soon
+Under the `test` directory, there will be one file: `test.cpp`. This file is to make sure that the code compiles and the library runs correctly. It is also recommended to replace `data.csv` with real data. In its current state, `data.csv` is a placeholder for real data.
 
 ## Issues
 
