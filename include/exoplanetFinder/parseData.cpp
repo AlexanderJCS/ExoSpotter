@@ -1,26 +1,23 @@
-#include <unordered_map>
 #include <iostream>
 #include <fstream>
 #include <ctype.h>
-#include <vector>
 #include <string>
 
-
+#include "detectExoplanets.h"
 
 /*
 Parses the data to be used in the FindPlanet class.
 */
-std::unordered_map<std::string, std::vector<float>> readData(std::string filename)
+ExoplanetFinder::Data readData(std::string filename)
 {
 	std::ifstream file{filename};
 	
 	if (!file.is_open()) {
-		std::cout << "could not open file\n";
+		std::cout << "\nCould not open file " << filename;
 		exit(1);
 	}
 	
-	std::unordered_map<std::string, std::vector<float>> returnMap;
-
+	ExoplanetFinder::Data returnData;
 	std::string line;
 	
 	while (file) {
@@ -44,17 +41,17 @@ std::unordered_map<std::string, std::vector<float>> readData(std::string filenam
 		auto commaIndex = line.find(',');
 		
 		if (commaIndex == std::string::npos) {
-			std::cout << "Error with data with the line " << line << ". No seperator (,) found.";
+			std::cout << "\nError with data with the line " << line << ". No seperator (,) found.";
 			exit(1);
 		}
 
 		// Push back "flux" by the first value in the csv converted to a float
-		returnMap["flux"].push_back(std::stof(line.substr(0, commaIndex)));
+		returnData.flux.push_back(std::stof(line.substr(0, commaIndex)));
 
 		// Same thing here but with "date"
-		returnMap["date"].push_back(std::stof(line.substr(commaIndex + 1)));
+		returnData.date.push_back(std::stof(line.substr(commaIndex + 1)));
 	}
 	
 
-	return returnMap;
+	return returnData;
 }

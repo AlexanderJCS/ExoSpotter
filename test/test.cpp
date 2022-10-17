@@ -1,10 +1,9 @@
 #include <unordered_map>
 #include <iostream>
-#include <vector>
 #include <string>
 #include <chrono>
 
-#include "../include/exoplanetFinder/detect_exoplanets.h"
+#include "../include/exoplanetFinder/detectExoplanets.h"
 #include "../include/exoplanetFinder/parseData.h"
 
 using namespace std::chrono;
@@ -12,7 +11,7 @@ using namespace std::chrono;
 
 int main()
 {
-	DetectExoplanets::FindPlanet planetFinder{ readData("test/data.csv"), 0.99995, 0.001, 1.5, 0.5 };
+	ExoplanetFinder::FindPlanet planetFinder{ readData("test/data.csv"), 0.9999, 0.001, 1.5, 0.5 };
 	
 	auto start = high_resolution_clock::now();
 	auto planets = planetFinder.findPlanets(false);
@@ -20,8 +19,8 @@ int main()
 
 	std::cout << "*** FAST ALGORITHM ***\n";
 
-	for (const auto& planet : planets) {
-		std::cout << "Planet identified with flux: " << planet << "\n";
+	for (int i = 0; i < planets.size(); i++) {
+		std::cout << "Planet " << i + 1 << ":\n" << planets[i] << "\n";
 	}
 
 	auto duration = duration_cast<milliseconds>(stop - start);
@@ -33,8 +32,8 @@ int main()
 
 	std::cout << "\n *** PRECISE ALGORITHM ***\n";
 
-	for (auto& planet : planets) {
-		std::cout << planet << "\n";
+	for (int i = 0; i < planets.size(); i++) {
+		std::cout << "Planet " << i + 1 << ":\n" << planets[i] << "\n";
 	}
 
 	duration = duration_cast<milliseconds>(stop - start);

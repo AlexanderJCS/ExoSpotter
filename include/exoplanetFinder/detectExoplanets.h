@@ -1,12 +1,10 @@
 #pragma once
 
-
-#include <unordered_map>
 #include <vector>
 #include <string>
 
 
-namespace DetectExoplanets
+namespace ExoplanetFinder
 {
 	struct Exoplanet
 	{
@@ -18,13 +16,21 @@ namespace DetectExoplanets
 		Exoplanet();  // used to return nothing if a planet is not identified
 		Exoplanet(float firstTransitDate, float flux, float period);
 
-		friend std::ostream& operator<<(std::ostream& strm, const DetectExoplanets::Exoplanet& exoplanet);
+		friend std::ostream& operator<<(std::ostream& strm, const ExoplanetFinder::Exoplanet& exoplanet);
+	};
+
+	struct Data
+	{
+		std::vector<float> flux;
+		std::vector<float> date;
+
+		Data();
+		Data(std::vector<float> flux, std::vector<float> date);
 	};
 
 	class FindPlanet
 	{
-		std::vector<float> flux;
-		std::vector<float> date;
+		Data rawData{};
 
 		float potentialPlanetThreshold;
 		float samePlanetSizeThreshold;
@@ -35,22 +41,20 @@ namespace DetectExoplanets
 		Filters through the data to find datapoints under
 		 the value potentialPlanetThreshold
 		*/
-		std::unordered_map<std::string, std::vector<float>> findPlanetCandidates();
+		Data findPlanetCandidates();
 
 		/*
 		Groups datapoints from the same transit into one datapoint with the peak
 		datapoint with the corresponding Julian date.
 		*/
-		std::unordered_map<std::string, std::vector<float>> groupDatapoints(
-			std::unordered_map<std::string, std::vector<float>> data);
+		Data groupDatapoints(Data data);
 
 		/*
 		Splits the grouped datapoints into different unordered maps by the
 		size of the planet. Used for checking if the period between the data
 		is the same, meaning that it is a planet.
 		*/
-		std::vector<std::unordered_map<std::string, std::vector<float>>> splitDatapoints(
-			std::unordered_map<std::string, std::vector<float>> data);
+		std::vector<Data> splitDatapoints(Data data);
 
 		/*
 		Returns a planet struct of the planet identified.
@@ -59,7 +63,7 @@ namespace DetectExoplanets
 				 This would happen if two planets are similar size, it wouldn't get
 				 picked up by the grouping algorithm.
 		*/
-		Exoplanet planetInData(std::unordered_map<std::string, std::vector<float>> data);
+		Exoplanet planetInData(Data data);
 
 		/*
 		Returns -1 if a planet is not found. Otherwise returns the date
@@ -68,7 +72,7 @@ namespace DetectExoplanets
 		This method is to provide a more sophisticated algorithm which counteracts the
 		warning in the planetInData method, at the cost of time.
 		*/
-		Exoplanet planetInDataPrecise(std::unordered_map<std::string, std::vector<float>> data);
+		Exoplanet planetInDataPrecise(Data data);
 
 	public:
 		/*
@@ -93,8 +97,7 @@ namespace DetectExoplanets
 
 		TTVRange: The amount of variation the period of a planet can have, in days, to be considered the same planet.
 		*/
-		FindPlanet(std::unordered_map<std::string, std::vector<float>> data,
-			float planetThreshold, float sizeThreshold, float maxTransitDurationDays,
-			float TTVRange);
+		FindPlanet(Data data, float planetThreshold, float sizeThreshold, 
+			float maxTransitDurationDays, float TTVRange);
 	};
 }
