@@ -19,18 +19,18 @@ namespace ExoplanetFinder
 		friend std::ostream& operator<<(std::ostream& strm, const ExoplanetFinder::Exoplanet& exoplanet);
 	};
 
-	struct Data
+	struct Lightcurve
 	{
 		std::vector<float> flux;
 		std::vector<float> date;
 
-		Data();
-		Data(std::vector<float> flux, std::vector<float> date);
+		Lightcurve();
+		Lightcurve(std::vector<float> flux, std::vector<float> date);
 	};
 
 	class FindPlanet
 	{
-		Data rawData{};
+		Lightcurve rawData{};
 
 		float potentialPlanetThreshold;
 		float samePlanetSizeThreshold;
@@ -41,20 +41,20 @@ namespace ExoplanetFinder
 		Filters through the data to find datapoints under
 		 the value potentialPlanetThreshold
 		*/
-		Data findPlanetCandidates();
+		Lightcurve findPlanetCandidates();
 
 		/*
 		Groups datapoints from the same transit into one datapoint with the peak
 		datapoint with the corresponding Julian date.
 		*/
-		Data groupDatapoints(Data data);
+		Lightcurve groupDatapoints(Lightcurve data);
 
 		/*
 		Splits the grouped datapoints into different unordered maps by the
 		size of the planet. Used for checking if the period between the data
 		is the same, meaning that it is a planet.
 		*/
-		std::vector<Data> splitDatapoints(Data data);
+		std::vector<Lightcurve> splitDatapoints(Lightcurve data);
 
 		/*
 		Returns a planet struct of the planet identified.
@@ -63,7 +63,7 @@ namespace ExoplanetFinder
 				 This would happen if two planets are similar size, it wouldn't get
 				 picked up by the grouping algorithm.
 		*/
-		Exoplanet planetInData(Data data);
+		Exoplanet planetInData(Lightcurve data);
 
 		/*
 		Returns -1 if a planet is not found. Otherwise returns the date
@@ -72,7 +72,7 @@ namespace ExoplanetFinder
 		This method is to provide a more sophisticated algorithm which counteracts the
 		warning in the planetInData method, at the cost of time.
 		*/
-		Exoplanet planetInDataPrecise(Data data);
+		std::vector<Exoplanet> planetInDataPrecise(Lightcurve data);
 
 	public:
 		/*
@@ -97,7 +97,7 @@ namespace ExoplanetFinder
 
 		TTVRange: The amount of variation the period of a planet can have, in days, to be considered the same planet.
 		*/
-		FindPlanet(Data data, float planetThreshold, float sizeThreshold, 
+		FindPlanet(Lightcurve data, float planetThreshold, float sizeThreshold, 
 			float maxTransitDurationDays, float TTVRange);
 	};
 }

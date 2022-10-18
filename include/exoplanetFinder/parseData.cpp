@@ -8,7 +8,7 @@
 /*
 Parses the data to be used in the FindPlanet class.
 */
-ExoplanetFinder::Data readData(std::string filename)
+ExoplanetFinder::Lightcurve readData(std::string filename)
 {
 	std::ifstream file{filename};
 	
@@ -17,7 +17,7 @@ ExoplanetFinder::Data readData(std::string filename)
 		exit(1);
 	}
 	
-	ExoplanetFinder::Data returnData;
+	ExoplanetFinder::Lightcurve returnData;
 	std::string line;
 	
 	while (file) {

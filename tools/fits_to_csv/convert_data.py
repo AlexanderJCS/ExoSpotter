@@ -12,15 +12,12 @@ except ImportError:
 INFO = """
 This file's purpose is to convert .fits data into .csv data, which can be read by the
 C++ program. This program is meant to work with TESS satellite lightcuve data. Data
-from other sources are not garunteed to work. If you want to download a direct link to
-a MAST URL to download TESS data to test this program, do so here:
+from other sources may not work for certain. If you want to download TESS data to test
+this program, do so here:
 
 https://archive.stsci.edu/missions/tess/tid/s0001/0000/0000/2515/5310/tess2018206045859-s0001-0000000025155310-0120-s_lc.fits
 
 This link is lightcurve data for the star WASP-126.
-
-If you want to download data for another star, follow this guide under the instructions "post-search filter":
-https://outerspace.stsci.edu/display/TESS/6.1.6+-+Searching+For+And+Retrieving+TESS+Mission+Products
 
 Dependencies: astropy >= 3.0.4
 """

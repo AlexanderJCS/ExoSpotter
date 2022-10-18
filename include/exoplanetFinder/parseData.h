@@ -5,4 +5,4 @@
 
 #include "detectExoplanets.h"
 
-ExoplanetFinder::Data readData(std::string filename);
+ExoplanetFinder::Lightcurve readData(std::string filename);

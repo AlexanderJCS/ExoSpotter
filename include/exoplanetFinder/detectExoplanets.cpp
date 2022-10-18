@@ -24,9 +24,9 @@ std::ostream& ExoplanetFinder::operator<<(std::ostream& strm, const ExoplanetFin
 }
 
 
-ExoplanetFinder::Data::Data() { }
+ExoplanetFinder::Lightcurve::Lightcurve() { }
 
-ExoplanetFinder::Data::Data(std::vector<float> flux, std::vector<float> date)
+ExoplanetFinder::Lightcurve::Lightcurve(std::vector<float> flux, std::vector<float> date)
 {
 	this->flux = flux;
 	this->date = date;
@@ -37,14 +37,14 @@ ExoplanetFinder::Data::Data(std::vector<float> flux, std::vector<float> date)
 Filters through the data to find datapoints under
 the value potentialPlanetThreshold
 */
-ExoplanetFinder::Data ExoplanetFinder::FindPlanet::findPlanetCandidates()
+ExoplanetFinder::Lightcurve ExoplanetFinder::FindPlanet::findPlanetCandidates()
 {
 	if (rawData.flux.size() != rawData.date.size()) {
 		std::cout << "Flux size is not equal to date size.";
 		exit(2);
 	}
 
-	Data planetCandidates;
+	Lightcurve planetCandidates;
 
 	for (int i = 0; i < rawData.flux.size(); i++) {
 		if (rawData.flux[i] <= potentialPlanetThreshold) {
@@ -60,9 +60,9 @@ ExoplanetFinder::Data ExoplanetFinder::FindPlanet::findPlanetCandidates()
 Groups datapoints from the same transit into one datapoint with the peak
 datapoint with the corresponding Julian date.
 */
-ExoplanetFinder::Data ExoplanetFinder::FindPlanet::groupDatapoints(Data data)
+ExoplanetFinder::Lightcurve ExoplanetFinder::FindPlanet::groupDatapoints(Lightcurve data)
 {
-	Data groupedData;
+	Lightcurve groupedData;
 
 	float peakFlux = 2;
 	float peakFluxDate = 0;
@@ -102,9 +102,9 @@ Splits the grouped datapoints into different unordered maps by the
 size of the planet. Used for checking if the period between the data
 is the same, meaning that it is a planet.
 */
-std::vector<ExoplanetFinder::Data> ExoplanetFinder::FindPlanet::splitDatapoints(Data data)
+std::vector<ExoplanetFinder::Lightcurve> ExoplanetFinder::FindPlanet::splitDatapoints(Lightcurve data)
 {
-	std::vector<Data> splitData;
+	std::vector<Lightcurve> splitData;
 
 	for (int i = 0; i < data.flux.size(); i++) {
 		bool broken = false;
@@ -123,7 +123,7 @@ std::vector<ExoplanetFinder::Data> ExoplanetFinder::FindPlanet::splitDatapoints(
 			continue;
 		}
 
-		Data newGroup;
+		Lightcurve newGroup;
 		newGroup.flux = { data.flux[i] };
 		newGroup.date = { data.date[i] };
 		splitData.push_back(newGroup);
@@ -139,7 +139,7 @@ WARNING: This algorithm may give a false negative when two planets are in the sa
 		 This would happen if two planets are similar size, it wouldn't get
 		 picked up by the grouping algorithm.
 */
-ExoplanetFinder::Exoplanet ExoplanetFinder::FindPlanet::planetInData(Data data)
+ExoplanetFinder::Exoplanet ExoplanetFinder::FindPlanet::planetInData(Lightcurve data)
 {
 	if (data.flux.size() < 3) {
 		return Exoplanet{};  // not enough datapoints
@@ -161,11 +161,13 @@ ExoplanetFinder::Exoplanet ExoplanetFinder::FindPlanet::planetInData(Data data)
 This method is to provide a more sophisticated algorithm which counteracts the
 warning in the planetInData method, at the cost of time.
 */
-ExoplanetFinder::Exoplanet ExoplanetFinder::FindPlanet::planetInDataPrecise(Data data)
+std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDataPrecise(Lightcurve data)
 {
 	if (data.date.size() < 3) {
-		return Exoplanet{};
+		return {};
 	}
+
+	std::vector<Exoplanet> detectedExoplanets;
 
 	for (int i = 0; i < data.date.size(); i++) {
 		for (int j = i + 1; j < data.date.size(); j++) {
@@ -189,12 +191,25 @@ ExoplanetFinder::Exoplanet ExoplanetFinder::FindPlanet::planetInDataPrecise(Data
 			}
 
 			if (abs(nextExpectedTransit - closest) < TTVRange) {
-				return Exoplanet{data.date[i], data.flux[i], period};
+				bool broken = false;
+
+				Exoplanet candidate = Exoplanet{ data.date[i], data.flux[i], period };
+
+				for (Exoplanet exoplanet : detectedExoplanets) {
+					if (exoplanet.period - candidate.period < TTVRange * 2) {
+						broken = true;
+						break;
+					}
+				}
+
+				if (!broken) {
+					detectedExoplanets.push_back(candidate);
+				}
 			}
 		}
 	}
 
-	return Exoplanet{};
+	return detectedExoplanets;
 }
 
 /*
@@ -258,15 +273,13 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::findPlanets
 	auto candidates = findPlanetCandidates();
 	auto grouped = groupDatapoints(candidates);
 	auto splitted = splitDatapoints(grouped);
-
+	
 	std::vector<Exoplanet> planets;
 
 	for (auto splitData : splitted) {
-		Exoplanet planet = planetInDataPrecise(splitData);
+		std::vector<Exoplanet> exoplanets = planetInDataPrecise(splitData);
 
-		if (planet.isPlanet) {
-			planets.push_back(planet);
-		}
+		planets.insert(planets.end(), exoplanets.begin(), exoplanets.end());
 	}
 
 	if (verbose) {
@@ -314,7 +327,7 @@ maxTransitDurationDays: Used for grouping data. The amount of time, in days, tha
 
 TTVRange: The amount of variation the period of a planet can have, in days, to be considered the same planet.
 */
-ExoplanetFinder::FindPlanet::FindPlanet(Data data, float planetThreshold, 
+ExoplanetFinder::FindPlanet::FindPlanet(Lightcurve data, float planetThreshold, 
 	float sizeThreshold, float maxTransitDurationDays, float TTVRange)
 {
 	this->rawData.flux = data.flux;
