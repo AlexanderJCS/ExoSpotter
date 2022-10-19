@@ -36,6 +36,7 @@ namespace ExoplanetFinder
 		float samePlanetSizeThreshold;
 		float maxTransitDurationDays;
 		float TTVRange;
+		int allowedMissedTransits;
 
 		/*
 		Filters through the data to find datapoints under
@@ -98,6 +99,6 @@ namespace ExoplanetFinder
 		TTVRange: The amount of variation the period of a planet can have, in days, to be considered the same planet.
 		*/
 		FindPlanet(Lightcurve data, float planetThreshold, float sizeThreshold, 
-			float maxTransitDurationDays, float TTVRange);
+			float maxTransitDurationDays, float TTVRange, int allowedMissedTransits = 2);
 	};
 }

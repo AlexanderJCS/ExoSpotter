@@ -190,10 +190,16 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDat
 				closest = data.date[k];
 			}
 
-			if (abs(nextExpectedTransit - closest) < TTVRange) {
-				bool broken = false;
+			Exoplanet candidate = Exoplanet{ data.date[i], data.flux[i], period };
 
-				Exoplanet candidate = Exoplanet{ data.date[i], data.flux[i], period };
+			// if the diff between the next expected transit and the closest acutal transit is
+			// less than the TTVRange, then it is a possible planet.
+
+			// If more than allowedMissedTransits were missed, exclude this planet. This is to
+			// prevent noise data from being considered a real planet.
+			if (abs(nextExpectedTransit - closest) < TTVRange && 
+				(data.date[i] - data.date[0]) / candidate.period < allowedMissedTransits) {
+				bool broken = false;
 
 				for (Exoplanet exoplanet : detectedExoplanets) {
 					if (exoplanet.period - candidate.period < TTVRange * 2) {
@@ -328,7 +334,7 @@ maxTransitDurationDays: Used for grouping data. The amount of time, in days, tha
 TTVRange: The amount of variation the period of a planet can have, in days, to be considered the same planet.
 */
 ExoplanetFinder::FindPlanet::FindPlanet(Lightcurve data, float planetThreshold, 
-	float sizeThreshold, float maxTransitDurationDays, float TTVRange)
+	float sizeThreshold, float maxTransitDurationDays, float TTVRange, int allowedMissedTransits)
 {
 	this->rawData.flux = data.flux;
 	this->rawData.date = data.date;
@@ -337,4 +343,5 @@ ExoplanetFinder::FindPlanet::FindPlanet(Lightcurve data, float planetThreshold,
 	samePlanetSizeThreshold = sizeThreshold;
 	this->maxTransitDurationDays = maxTransitDurationDays;
 	this->TTVRange = TTVRange;
+	this->allowedMissedTransits = allowedMissedTransits;
 }
