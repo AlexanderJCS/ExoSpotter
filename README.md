@@ -76,6 +76,7 @@ To create the FindPlanet class, we need to pass in the five required input varia
 `float sizeThreshold`: The range that the flux can vary and be considered the same planet
 `float maxTransitDurationDays`: The maximum amount of time, in days, that the transit can take.
 `float TTVRange`: The amount of variation the period of a planet can have, in days, to be considered the same planet.
+`int allowedMissedTransits = 2`: ***optional*** parameter which defaults to 2. This is the number of transits that cna be missed and still be counted as an exoplanet. This is made to reduce false positives in noisy data. Unless you have a specific reasion, it is recommended to keep this at 2.
 
 Using this information, we can create the planet class:
 ```cpp
@@ -84,7 +85,7 @@ Using this information, we can create the planet class:
 int main()
 {
     ExoplanetFinder::Data data = parseData("filename.csv");  // define the data, read the previous section for more info
-    DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.002, 1.5, 0.4 };
+    DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.002, 1.5, 0.4, 2 };
 }
 ```
 
