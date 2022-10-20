@@ -71,12 +71,12 @@ We will get a `Data` type in the output.
 ## Creating the FindPlanet class
 
 To create the FindPlanet class, we need to pass in the five required input variables:
-`Data data`: The data aquired using the last step
-`float planetThreshold`: The minimum amount the flux can dip under for it to be considered a potential datapoint with a planet inside of it.
-`float sizeThreshold`: The range that the flux can vary and be considered the same planet
-`float maxTransitDurationDays`: The maximum amount of time, in days, that the transit can take.
-`float TTVRange`: The amount of variation the period of a planet can have, in days, to be considered the same planet.
-`int allowedMissedTransits = 2`: ***optional*** parameter which defaults to 2. This is the number of transits that cna be missed and still be counted as an exoplanet. This is made to reduce false positives in noisy data. Unless you have a specific reasion, it is recommended to keep this at 2.
+- `Data data`: The data aquired using the last step
+- `float planetThreshold`: The minimum amount the flux can dip under for it to be considered a potential datapoint with a planet inside of it.
+- `float sizeThreshold`: The range that the flux can vary and be considered the same planet
+- `float maxTransitDurationDays`: The maximum amount of time, in days, that the transit can take.
+- `float TTVRange`: The amount of variation the period of a planet can have, in days, to be considered the same planet.
+- `int allowedMissedTransits = 2`: ***optional*** parameter which defaults to 2. This is the number of transits that cna be missed and still be counted as an exoplanet. This is made to reduce false positives in noisy data. Unless you have a specific reasion, it is recommended to keep this at 2.
 
 Using this information, we can create the planet class:
 ```cpp
