@@ -11,7 +11,7 @@ using namespace std::chrono;
 
 int main()
 {
-	ExoplanetFinder::FindPlanet planetFinder{ readData("test/data.csv"), 0.9999, 0.001, 1.5, 0.1, 2 };
+	ExoplanetFinder::FindPlanet planetFinder{ readData("test/data.csv"), 0.9999, 0.003, 1.5, 0.1, 2 };
 	
 	auto start = high_resolution_clock::now();
 	auto planets = planetFinder.findPlanets(false);
