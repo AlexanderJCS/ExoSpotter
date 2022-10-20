@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cmath>
 
 #include "detectExoplanets.h"
 
@@ -174,7 +175,6 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDat
 			float period = data.date[j] - data.date[i];
 
 			float closest = data.date[j];
-			int closestIndex = j;
 			float nextExpectedTransit = data.date[j] + period;
 			float lastDiff = abs(closest - nextExpectedTransit);
 
@@ -186,30 +186,48 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDat
 				}
 
 				lastDiff = abs(data.date[k] - nextExpectedTransit);
-				closestIndex = k;
 				closest = data.date[k];
 			}
 
 			Exoplanet candidate = Exoplanet{ data.date[i], data.flux[i], period };
 
-			// if the diff between the next expected transit and the closest acutal transit is
+			// if the dist between the next expected transit and the closest acutal transit is
 			// less than the TTVRange, then it is a possible planet.
 
 			// If more than allowedMissedTransits were missed, exclude this planet. This is to
 			// prevent noise data from being considered a real planet.
-			if (abs(nextExpectedTransit - closest) < TTVRange && 
-				(data.date[i] - data.date[0]) / candidate.period < allowedMissedTransits) {
+			if (fabs(nextExpectedTransit - closest) < TTVRange && 
+				(data.date[i] - rawData.date[0]) / candidate.period < allowedMissedTransits) {
 				bool broken = false;
 
-				for (Exoplanet exoplanet : detectedExoplanets) {
-					if (exoplanet.period - candidate.period < TTVRange * 2) {
-						broken = true;
+				// if the diff between the next expected transit and the closest acutal transit is
+			// less than the TTVRange, then it is a possible planet.
+
+			// If more than allowedMissedTransits were missed, exclude this planet. This is to
+			// prevent noise data from being considered a real planet.
+				if (abs(nextExpectedTransit - closest) < TTVRange &&
+					(data.date[i] - data.date[0]) / candidate.period < allowedMissedTransits) {
+					bool broken = false;
+
+					for (Exoplanet exoplanet : detectedExoplanets) {
+						Exoplanet& greatest = exoplanet;
+						Exoplanet& smallest = candidate;
+
+						if (candidate.period > exoplanet.period) {
+							greatest = candidate;
+							smallest = exoplanet;
+						}
+
+						if (abs(greatest.period - smallest.period * round(greatest.period / smallest.period)) < TTVRange) {
+							broken = true;
+							break;
+						}
+					}
+
+					if (!broken) {
+						detectedExoplanets.push_back(candidate);
 						break;
 					}
-				}
-
-				if (!broken) {
-					detectedExoplanets.push_back(candidate);
 				}
 			}
 		}
