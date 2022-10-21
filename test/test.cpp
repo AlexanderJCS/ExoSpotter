@@ -11,7 +11,7 @@ using namespace std::chrono;
 
 int main()
 {
-	ExoplanetFinder::FindPlanet planetFinder{ readData("test/data.csv"), 0.9999, 0.003, 1.5, 0.1, 2 };
+	ExoplanetFinder::FindPlanet planetFinder{ readData("test/wasp-126_data.csv"), 0.9999, 0.003, 1.5, 0.2, 2 };
 	
 	auto start = high_resolution_clock::now();
 	auto planets = planetFinder.findPlanets(false);
@@ -27,10 +27,10 @@ int main()
 	std::cout << "\nCompleted in " << duration.count() << " ms\n";
 
 	start = high_resolution_clock::now();
-	planets = planetFinder.findPlanetsPrecise(false);
+	planets = planetFinder.findPlanetsPrecise(true);
 	stop = high_resolution_clock::now();
 
-	std::cout << "\n *** PRECISE ALGORITHM ***\n";
+	std::cout << "\n*** PRECISE ALGORITHM ***\n";
 
 	for (int i = 0; i < planets.size(); i++) {
 		std::cout << "Planet " << i + 1 << ":\n" << planets[i] << "\n";

@@ -10,11 +10,14 @@ namespace ExoplanetFinder
 	{
 		bool isPlanet = false;
 		float firstTransitDate = 0;
-		float flux = 0;
+		float firstFlux = 0;
 		float period = 0;
 
 		Exoplanet();  // used to return nothing if a planet is not identified
 		Exoplanet(float firstTransitDate, float flux, float period);
+
+		float findSemiMajAxis(float starSolarMasses);
+		float findRadiusRatio();
 
 		friend std::ostream& operator<<(std::ostream& strm, const ExoplanetFinder::Exoplanet& exoplanet);
 	};
@@ -74,6 +77,9 @@ namespace ExoplanetFinder
 		warning in the planetInData method, at the cost of time.
 		*/
 		std::vector<Exoplanet> planetInDataPrecise(Lightcurve data);
+
+		void printVerbose(
+			Lightcurve candidates, Lightcurve grouped, std::vector<Lightcurve> splitted, std::vector<Exoplanet> planets);
 
 	public:
 		/*

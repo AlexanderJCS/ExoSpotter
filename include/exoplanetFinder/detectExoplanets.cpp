@@ -17,6 +17,17 @@ ExoplanetFinder::Exoplanet::Exoplanet(float firstTransitDate, float flux, float 
 	this->period = period;
 }
 
+float ExoplanetFinder::Exoplanet::findSemiMajAxis(float starSolarMasses)
+{
+	// T^2 / r^3 = 1 / M (solar masses)
+	// r = cube root(M * T^2)
+	return std::cbrt(starSolarMasses * (period * period));
+}
+
+float ExoplanetFinder::Exoplanet::findRadiusRatio()
+{
+	return std::sqrt(1 - flux);
+}
 
 std::ostream& ExoplanetFinder::operator<<(std::ostream& strm, const ExoplanetFinder::Exoplanet& exoplanet) {
 	return strm << "First observed transit date: " << exoplanet.firstTransitDate <<
@@ -236,6 +247,38 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDat
 	return detectedExoplanets;
 }
 
+void ExoplanetFinder::FindPlanet::printVerbose(
+	Lightcurve candidates, Lightcurve grouped, std::vector<Lightcurve> splitted, std::vector<Exoplanet> planets)
+{
+	std::cout << "*** Candidates ***\n\n";
+
+	for (int i = 0; i < candidates.flux.size(); i++) {
+		std::cout << candidates.flux[i] << "," << candidates.date[i] << "\n";
+	}
+
+	std::cout << "\n\n*** Grouped ***\n\n";
+
+	for (int i = 0; i < grouped.flux.size(); i++) {
+		std::cout << grouped.flux[i] << "," << grouped.date[i] << "\n";
+	}
+
+	for (int i = 0; i < splitted.size(); i++) {
+		std::cout << "\n\n*** SPLIT GROUP " << i << " ***\n\n";
+
+		for (int j = 0; j < splitted[i].flux.size(); j++) {
+			std::cout << splitted[i].flux[j] << "," << splitted[i].date[j] << "\n";
+		}
+	}
+
+	std::cout << "\n\n*** Planet Fluxes *** \n\n";
+
+	for (auto planet : planets) {
+		std::cout << planet << "\n";
+	}
+
+	std::cout << "\n";
+}
+
 /*
 Calls other methods necessary to find planets
 */
@@ -257,33 +300,7 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::findPlanets
 	
 	// Print additional info if verbose is enabled, mainly used for debugging
 	if (verbose) {
-		std::cout << "*** Candidates ***\n\n";
-
-		for (int i = 0; i < candidates.flux.size(); i++) {
-			std::cout << candidates.flux[i] << "," << candidates.date[i] << "\n";
-		}
-
-		std::cout << "\n\n*** Grouped ***\n\n";
-
-		for (int i = 0; i < grouped.flux.size(); i++) {
-			std::cout << grouped.flux[i] << "," << grouped.date[i] << "\n";
-		}
-
-		for (int i = 0; i < splitted.size(); i++) {
-			std::cout << "\n\n*** SPLIT GROUP " << i << " ***\n\n";
-
-			for (int j = 0; j < splitted[i].flux.size(); j++) {
-				std::cout << splitted[i].flux[j] << "," << splitted[i].date[j] << "\n";
-			}
-		}
-
-		std::cout << "\n\n*** Planet Fluxes *** \n\n";
-
-		for (auto planet : planets) {
-			std::cout << planet << "\n";
-		}
-
-		std::cout << "\n";
+		printVerbose(candidates, grouped, splitted, planets);
 	}
 
 	return planets;
@@ -307,33 +324,7 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::findPlanets
 	}
 
 	if (verbose) {
-		std::cout << "*** Candidates ***\n\n";
-
-		for (int i = 0; i < candidates.flux.size(); i++) {
-			std::cout << candidates.flux[i] << "," << candidates.date[i] << "\n";
-		}
-
-		std::cout << "\n\n*** Grouped ***\n\n";
-
-		for (int i = 0; i < grouped.flux.size(); i++) {
-			std::cout << grouped.flux[i] << "," << grouped.date[i] << "\n";
-		}
-
-		for (int i = 0; i < splitted.size(); i++) {
-			std::cout << "\n\n*** SPLIT GROUP " << i << " ***\n\n";
-
-			for (int j = 0; j < splitted[i].flux.size(); j++) {
-				std::cout << splitted[i].flux[j] << "," << splitted[i].date[j] << "\n";
-			}
-		}
-
-		std::cout << "\n\n*** Planet Fluxes *** \n\n";
-
-		for (auto planet : planets) {
-			std::cout << planet << "\n";
-		}
-
-		std::cout << "\n";
+		printVerbose(candidates, grouped, splitted, planets);
 	}
 
 	return planets;
