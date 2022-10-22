@@ -22,6 +22,8 @@ std::vector<float> dates = { 142.5, 143,  143.5, 144, 144.5 };
 ExoplanetFinder::Lightcurve myLightcurve{ fluxes, dates };
 ```
 
+**A `std::invalid_argument` error will be thrown if the flux and date vectors are not the same size.**
+
 ## Empty constructor
 
 The purpose of the empty Lightcurve constructor is to allow initialization of the struct without adding any values into the `flux` and `date` variables. Calling the empty constructor is effectively the same thing as running `ExoplanetFinder::Lightcurve myLightcurve{{}, {}}`, but it provides a more conscise way of doing so.

@@ -1,9 +1,46 @@
+#include <stdexcept>
 #include <iostream>
 #include <vector>
 #include <string>
 #include <cmath>
 
 #include "detectExoplanets.h"
+
+
+ExoplanetFinder::Lightcurve::Lightcurve() { }
+
+
+ExoplanetFinder::Lightcurve::Lightcurve(std::vector<float> flux, std::vector<float> date)
+{
+	if (flux.size() != date.size()) {
+		throw std::invalid_argument("Lightcurve vector sizes must be the same");
+	}
+
+	this->flux = flux;
+	this->date = date;
+}
+
+
+ExoplanetFinder::Lightcurve ExoplanetFinder::Lightcurve::slice(int beginIndex, int endIndex)
+{
+	if (beginIndex > endIndex) {
+		return Lightcurve{};
+	}
+
+	;
+	std::vector<float> cutDate;
+
+	auto fluxBegin = this->flux.begin() + beginIndex;
+	auto fluxEnd = this->flux.begin() + endIndex + 1;
+
+	auto dateBegin = this->date.begin() + beginIndex;
+	auto dateEnd = this->date.begin() + endIndex + 1;
+
+	std::vector<float> slicedFlux(fluxBegin, fluxEnd);
+	std::vector<float> slicedDate(dateBegin, dateEnd);
+
+	return Lightcurve{ slicedFlux, slicedDate };
+}
 
 
 ExoplanetFinder::Exoplanet::Exoplanet() { };  // called if there is no planet identified
@@ -65,38 +102,6 @@ std::ostream& ExoplanetFinder::operator<<(std::ostream& strm, const ExoplanetFin
 	return strm << "First observed transit date: " << exoplanet.planetDatapoints.date[0] <<
 				   "\nFirst observed flux: " << exoplanet.planetDatapoints.flux[0] <<
 				   "\nPeriod: " << exoplanet.averagePeriod << " days\n";
-}
-
-
-ExoplanetFinder::Lightcurve::Lightcurve() { }
-
-
-ExoplanetFinder::Lightcurve::Lightcurve(std::vector<float> flux, std::vector<float> date)
-{
-	this->flux = flux;
-	this->date = date;
-}
-
-
-ExoplanetFinder::Lightcurve ExoplanetFinder::Lightcurve::slice(int beginIndex, int endIndex)
-{
-	if (beginIndex > endIndex) {
-		return Lightcurve{};
-	}
-
-	;
-	std::vector<float> cutDate;
-
-	auto fluxBegin = this->flux.begin() + beginIndex;
-	auto fluxEnd = this->flux.begin() + endIndex + 1;
-
-	auto dateBegin = this->date.begin() + beginIndex;
-	auto dateEnd = this->date.begin() + endIndex + 1;
-	
-	std::vector<float> slicedFlux(fluxBegin, fluxEnd);
-	std::vector<float> slicedDate(dateBegin, dateEnd);
-
-	return Lightcurve{ slicedFlux, slicedDate };
 }
 
 
