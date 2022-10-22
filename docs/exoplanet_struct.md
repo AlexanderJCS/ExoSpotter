@@ -5,7 +5,6 @@ The `Exoplanet` struct is used as the return value of the `FindPlanet` class. It
 # Data contained in the Exoplanet struct
 
 The exoplanet struct contains three main values:
-- `bool isPlanet`: Signifies if the data is representing a planet or if it is junk data. This should almost always be false.
 - `float averageFlux`: The average normalized flux of the planet. Normalized flux means that 1 = average brightness of the star and 0 = no light.
 - `float averagePeriod`: The average orbital period of the planet.
 - `Lightcurve planetDatapoints`: Specific datapoints the program found that signifies the exoplanet's existence.
@@ -29,9 +28,7 @@ int main()
 
 When working on developing the library, it is essential to fully understand the values of the Exoplanet constructor. However, if you are only using this library and not developing it, you can skip this section.
 
-## Non-empty Constructor Arguments
-
-To input data into the constructor, the Exoplanet struct only requires a `Lightcurve` struct.
+The Exoplanet struct only requires a `Lightcurve` struct.
 
 Here is an example of initializing the Exoplanet struct:
 ```cpp
@@ -48,16 +45,6 @@ int main()
 
     return 0;
 }
-```
-
-## Empty Constructor Arguments
-
-The empty constructor of the Exoplanet struct is only used as a return value from a function when no exoplanet was found. An example of this is the private method `ExoplanetFinder::FindPlanet::planetInData` method.
-
-To use this empty constructor, do the following:
-
-```cpp
-ExoplanetFinder::Exoplanet myExoplanet{};
 ```
 
 # Find the Semi-Major Axis

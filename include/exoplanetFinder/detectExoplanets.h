@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 #include <string>
 
@@ -19,13 +20,11 @@ namespace ExoplanetFinder
 
 	struct Exoplanet
 	{
-		bool isPlanet = false;
 		float averageFlux = 0;
 		float averagePeriod = 0;
 
 		Lightcurve planetDatapoints;
 
-		Exoplanet();  // used to return nothing if a planet is not identified
 		Exoplanet(Lightcurve planetDatapoints);
 
 		/*
@@ -78,11 +77,10 @@ namespace ExoplanetFinder
 				 This would happen if two planets are similar size, it wouldn't get
 				 picked up by the grouping algorithm.
 		*/
-		Exoplanet planetInData(Lightcurve data);
+		std::optional<Exoplanet> planetInData(Lightcurve data);
 
 		/*
-		Returns -1 if a planet is not found. Otherwise returns the date
-		of the flux of the of the planet found.
+		Returns a vector of all the planets found.
 
 		This method is to provide a more sophisticated algorithm which counteracts the
 		warning in the planetInData method, at the cost of time.

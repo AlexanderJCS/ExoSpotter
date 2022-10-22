@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <optional>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -43,12 +44,8 @@ ExoplanetFinder::Lightcurve ExoplanetFinder::Lightcurve::slice(int beginIndex, i
 }
 
 
-ExoplanetFinder::Exoplanet::Exoplanet() { };  // called if there is no planet identified
-
-
 ExoplanetFinder::Exoplanet::Exoplanet(Lightcurve planetDatapoints)
 {
-	isPlanet = true;
 	this->planetDatapoints = planetDatapoints;
 
 	float fluxAverage = 0;
@@ -214,10 +211,10 @@ WARNING: This algorithm may give a false negative when two planets are in the sa
 		 This would happen if two planets are similar size, it wouldn't get
 		 picked up by the grouping algorithm.
 */
-ExoplanetFinder::Exoplanet ExoplanetFinder::FindPlanet::planetInData(Lightcurve data)
+std::optional<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInData(Lightcurve data)
 {
 	if (data.flux.size() < 3) {
-		return Exoplanet{};  // not enough datapoints
+		return { };  // not enough datapoints
 	}
 
 	for (int i = 0; i < data.date.size() - 2; i++) {
@@ -229,7 +226,7 @@ ExoplanetFinder::Exoplanet ExoplanetFinder::FindPlanet::planetInData(Lightcurve 
 		}
 	}
 
-	return Exoplanet{};
+	return {};
 }
 
 
@@ -363,10 +360,10 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::findPlanets
 	std::vector<Exoplanet> planets;
 
 	for (auto& group : splitted) {
-		Exoplanet planetInfo = planetInData(group);
+		std::optional<Exoplanet> planetInfo = planetInData(group);
 
-		if (planetInfo.isPlanet) {
-			planets.push_back(planetInfo);
+		if (planetInfo) {
+			planets.push_back(planetInfo.value());
 		}
 	}
 	
