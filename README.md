@@ -3,7 +3,9 @@ ExoSpotter is a C++ library to find planets outside our solar system given the t
 
 To start out, it is recommended you review:
 - [how to parse data](https://github.com/AlexanderJCS/ExoSpotter/blob/main/docs/parse_data.md)
-- [and the FindPlanet class](https://github.com/AlexanderJCS/ExoSpotter/blob/main/docs/find_planet_class.md)
+- [the FindPlanet class](https://github.com/AlexanderJCS/ExoSpotter/blob/main/docs/find_planet_class.md)
+- [and the Exoplanet struct](https://github.com/AlexanderJCS/ExoSpotter/blob/main/docs/exoplanet_struct.md)
+
 
 # Table of Contents
 
