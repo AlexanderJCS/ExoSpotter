@@ -5,7 +5,7 @@
 #include <string>
 
 
-namespace ExoplanetFinder
+namespace ExoSpotter
 {
 	struct Lightcurve
 	{
@@ -38,7 +38,7 @@ namespace ExoplanetFinder
 		*/
 		float findRadiusRatio();
 
-		friend std::ostream& operator<<(std::ostream& strm, const ExoplanetFinder::Exoplanet& exoplanet);
+		friend std::ostream& operator<<(std::ostream& strm, const ExoSpotter::Exoplanet& exoplanet);
 	};
 
 	class FindPlanet

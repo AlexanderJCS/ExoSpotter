@@ -21,10 +21,10 @@ Using the parseData header makes it simple to get the data from a csv into the c
 
 By using `parseData.h`, we can write the following code:
 ```cpp
-#include "include/exoplanetFinder/parseData.h"
+#include "include/exoSpotter/parseData.h"
 
 int main()
 {
-    ExoplanetFinder::Lightcurve data = readData("filename.csv");  // replace "filename" with your file's name
+    ExoSpotter::Lightcurve data = readData("filename.csv");  // replace "filename" with your file's name
 }
 ```

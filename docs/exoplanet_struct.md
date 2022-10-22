@@ -11,15 +11,15 @@ The exoplanet struct contains three main values:
 
 These values can be accessed by doing:
 ```cpp
-#include "include/exoplanetFinder/detectExoplanets.h"
+#include "include/exoSpotter/exoSpotter.h"
 
 int main()
 {
-    ExoplanetFinder::Exoplanet myExoplanet = ...;
+    ExoSpotter::Exoplanet myExoplanet = ...;
 
     float flux = myExoplanet.averageFlux;
     float period = myExoplanet.averagePeriod;
-    ExoplanetFinder::Lightcurve datapoints = myExoplanet.planetDatapoints;
+    ExoSpotter::Lightcurve datapoints = myExoplanet.planetDatapoints;
 }
 
 ```
@@ -32,16 +32,16 @@ The Exoplanet struct only requires a `Lightcurve` struct.
 
 Here is an example of initializing the Exoplanet struct:
 ```cpp
-#include "include/exoplanetFinder/detectExoplanets.h"
+#include "include/exoSpotter/exoSpotter.h"
 
 int main()
 {
     // Create a lightcurve struct to input into the Exoplanet constructor.
     // If you haven't already, see lightcurve_struct.md to understand how to
     // initalize that struct.
-    ExoplanetFinder::Lightcurve planetData{ ... };
+    ExoSpotter::Lightcurve planetData{ ... };
 
-    ExoplanetFinder::Exoplanet myExoplanet{ planetData };
+    ExoSpotter::Exoplanet myExoplanet{ planetData };
 
     return 0;
 }
@@ -53,7 +53,7 @@ To find the semi-major axis of the orbit in astronomical units (AU), run the met
 
 An example of this:
 ```cpp
-ExoplanetFinder::Exoplanet myExoplanet = ...;
+ExoSpotter::Exoplanet myExoplanet = ...;
 
 // the star's mass in solar masses
 float starMass = 2.3;
@@ -68,11 +68,11 @@ To find the ratio between the planet's radius and the host star's radius, use th
 
 Usage looks like the following:
 ```cpp
-#include "include/exoplanetFinder/detectExoplanets.h"
+#include "include/exoSpotter/exoSpotter.h"
 
 int main()
 {
-    ExoplanetFinder::Exoplanet myExoplanet = ...;
+    ExoSpotter::Exoplanet myExoplanet = ...;
 
     const float starRadius = ...  // optional: the host star's radius
     float radiusRatio = myExoplanet.findRadiusRatio();

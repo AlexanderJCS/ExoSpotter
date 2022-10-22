@@ -5,13 +5,13 @@
 #include <string>
 #include <cmath>
 
-#include "detectExoplanets.h"
+#include "exoSpotter.h"
 
 
-ExoplanetFinder::Lightcurve::Lightcurve() { }
+ExoSpotter::Lightcurve::Lightcurve() { }
 
 
-ExoplanetFinder::Lightcurve::Lightcurve(std::vector<float> flux, std::vector<float> date)
+ExoSpotter::Lightcurve::Lightcurve(std::vector<float> flux, std::vector<float> date)
 {
 	if (flux.size() != date.size()) {
 		throw std::invalid_argument("Lightcurve vector sizes must be the same");
@@ -22,7 +22,7 @@ ExoplanetFinder::Lightcurve::Lightcurve(std::vector<float> flux, std::vector<flo
 }
 
 
-ExoplanetFinder::Lightcurve ExoplanetFinder::Lightcurve::slice(int beginIndex, int endIndex)
+ExoSpotter::Lightcurve ExoSpotter::Lightcurve::slice(int beginIndex, int endIndex)
 {
 	if (beginIndex > endIndex) {
 		return Lightcurve{};
@@ -44,7 +44,7 @@ ExoplanetFinder::Lightcurve ExoplanetFinder::Lightcurve::slice(int beginIndex, i
 }
 
 
-ExoplanetFinder::Exoplanet::Exoplanet(Lightcurve planetDatapoints)
+ExoSpotter::Exoplanet::Exoplanet(Lightcurve planetDatapoints)
 {
 	this->planetDatapoints = planetDatapoints;
 
@@ -73,7 +73,7 @@ ExoplanetFinder::Exoplanet::Exoplanet(Lightcurve planetDatapoints)
 /*
 Finds the planet's semi-major axis (orbital radius) given the star's solar masses.
 */
-float ExoplanetFinder::Exoplanet::findSemiMajAxis(float starSolarMasses)
+float ExoSpotter::Exoplanet::findSemiMajAxis(float starSolarMasses)
 {
 	// T^2 / r^3 = 1 / M (solar masses)
 	// r = cube root(M * T^2)
@@ -85,7 +85,7 @@ float ExoplanetFinder::Exoplanet::findSemiMajAxis(float starSolarMasses)
 Finds the ratio of the planet radius / host star radius.
 Returns -1 if the ratio cannot be found (usually due to there being no flux).
 */
-float ExoplanetFinder::Exoplanet::findRadiusRatio()
+float ExoSpotter::Exoplanet::findRadiusRatio()
 {
 	if (averageFlux > 0) {
 		return std::sqrt(1 - averageFlux);
@@ -95,7 +95,7 @@ float ExoplanetFinder::Exoplanet::findRadiusRatio()
 }
 
 
-std::ostream& ExoplanetFinder::operator<<(std::ostream& strm, const ExoplanetFinder::Exoplanet& exoplanet) {
+std::ostream& ExoSpotter::operator<<(std::ostream& strm, const ExoSpotter::Exoplanet& exoplanet) {
 	return strm << "First observed transit date: " << exoplanet.planetDatapoints.date[0] <<
 				   "\nFirst observed flux: " << exoplanet.planetDatapoints.flux[0] <<
 				   "\nPeriod: " << exoplanet.averagePeriod << " days\n";
@@ -106,7 +106,7 @@ std::ostream& ExoplanetFinder::operator<<(std::ostream& strm, const ExoplanetFin
 Filters through the data to find datapoints under
 the value potentialPlanetThreshold
 */
-ExoplanetFinder::Lightcurve ExoplanetFinder::FindPlanet::findPlanetCandidates()
+ExoSpotter::Lightcurve ExoSpotter::FindPlanet::findPlanetCandidates()
 {
 	if (rawData.flux.size() != rawData.date.size()) {
 		std::cout << "Flux size is not equal to date size.";
@@ -130,7 +130,7 @@ ExoplanetFinder::Lightcurve ExoplanetFinder::FindPlanet::findPlanetCandidates()
 Groups datapoints from the same transit into one datapoint with the peak
 datapoint with the corresponding Julian date.
 */
-ExoplanetFinder::Lightcurve ExoplanetFinder::FindPlanet::groupDatapoints(Lightcurve data)
+ExoSpotter::Lightcurve ExoSpotter::FindPlanet::groupDatapoints(Lightcurve data)
 {
 	Lightcurve groupedData;
 
@@ -173,7 +173,7 @@ Splits the grouped datapoints into different unordered maps by the
 size of the planet. Used for checking if the period between the data
 is the same, meaning that it is a planet.
 */
-std::vector<ExoplanetFinder::Lightcurve> ExoplanetFinder::FindPlanet::splitDatapoints(Lightcurve data)
+std::vector<ExoSpotter::Lightcurve> ExoSpotter::FindPlanet::splitDatapoints(Lightcurve data)
 {
 	std::vector<Lightcurve> splitData;
 
@@ -211,7 +211,7 @@ WARNING: This algorithm may give a false negative when two planets are in the sa
 		 This would happen if two planets are similar size, it wouldn't get
 		 picked up by the grouping algorithm.
 */
-std::optional<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInData(Lightcurve data)
+std::optional<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInData(Lightcurve data)
 {
 	if (data.flux.size() < 3) {
 		return { };  // not enough datapoints
@@ -234,7 +234,7 @@ std::optional<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInD
 This method is to provide a more sophisticated algorithm which counteracts the
 warning in the planetInData method, at the cost of time.
 */
-std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDataPrecise(Lightcurve data)
+std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInDataPrecise(Lightcurve data)
 {
 	if (data.date.size() < 3) {
 		return {};
@@ -315,7 +315,7 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDat
 	return detectedExoplanets;
 }
 
-void ExoplanetFinder::FindPlanet::printVerbose(
+void ExoSpotter::FindPlanet::printVerbose(
 	Lightcurve candidates, Lightcurve grouped, std::vector<Lightcurve> splitted, std::vector<Exoplanet> planets)
 {
 	std::cout << "*** Candidates ***\n\n";
@@ -351,7 +351,7 @@ void ExoplanetFinder::FindPlanet::printVerbose(
 /*
 Calls other methods necessary to find planets
 */
-std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::findPlanets(bool verbose)
+std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::findPlanets(bool verbose)
 {
 	auto candidates = findPlanetCandidates();
 	auto grouped = groupDatapoints(candidates);
@@ -379,7 +379,7 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::findPlanets
 /*
 Uses a different algorithm to find more exoplanets at the expense of time
 */
-std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::findPlanetsPrecise(bool verbose)
+std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::findPlanetsPrecise(bool verbose)
 {
 	auto candidates = findPlanetCandidates();
 	auto grouped = groupDatapoints(candidates);
@@ -413,7 +413,7 @@ maxTransitDurationDays: Used for grouping data. The amount of time, in days, tha
 
 TTVRange: The amount of variation the period of a planet can have, in days, to be considered the same planet.
 */
-ExoplanetFinder::FindPlanet::FindPlanet(Lightcurve data, float planetThreshold, 
+ExoSpotter::FindPlanet::FindPlanet(Lightcurve data, float planetThreshold, 
 	float sizeThreshold, float maxTransitDurationDays, float TTVRange, int allowedMissedTransits)
 {
 	this->rawData.flux = data.flux;

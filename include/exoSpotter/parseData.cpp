@@ -3,12 +3,12 @@
 #include <ctype.h>
 #include <string>
 
-#include "detectExoplanets.h"
+#include "exoSpotter.h"
 
 /*
 Parses the data to be used in the FindPlanet class.
 */
-ExoplanetFinder::Lightcurve readData(std::string filename)
+ExoSpotter::Lightcurve readData(std::string filename)
 {
 	std::ifstream file{filename};
 	
@@ -17,7 +17,7 @@ ExoplanetFinder::Lightcurve readData(std::string filename)
 		exit(1);
 	}
 	
-	ExoplanetFinder::Lightcurve returnData;
+	ExoSpotter::Lightcurve returnData;
 	std::string line;
 	
 	while (file) {

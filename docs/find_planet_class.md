@@ -16,11 +16,11 @@ To create the FindPlanet class, we need to pass in the six required input variab
 Using this information, we can create the planet class:
 
 ```cpp
-#include "include/exoplanetFinder/detect_exoplanets.h"
+#include "include/exoSpotter/exoSpotter.h"
 
 int main()
 {
-    ExoplanetFinder::Data data = parseData("filename.csv");  // define the data, read the previous section for more info
+    ExoSpotter::Data data = parseData("filename.csv");  // define the data, read the previous section for more info
     DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.002, 1.5, 0.4, 2 };
 }
 ```
@@ -35,13 +35,13 @@ There is also an optional `bool verbose` argument that can be passed into this m
 ```cpp
 #include <iostream>
 
-#include "include/exoplanetFinder/detect_exoplanets.h"
+#include "include/exoSpotter/exoSpotter.h"
 
 
 int main()
 {
     // This code is explained in parse_data.md section
-    ExoplanetFinder::Data data = readData("filename.csv");  // replace "filename" with your file's name
+    ExoSpotter::Data data = readData("filename.csv");  // replace "filename" with your file's name
     
     // Initalize the FindPlanet class
     DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.003, 1.0, 0.1, 2 };
@@ -65,12 +65,12 @@ Here is some example code:
 #include <iostream>
 #include <vector>
 
-#include "include/exoplanetFinder/detect_exoplanets.h"
+#include "include/exoSpotter/exoSpotter.h"
 
 int main()
 {
     // This code is explained in parse_data.md section
-    ExoplanetFinder::Data data = parseData("filename.csv");  // replace "filename" with your file's name
+    ExoSpotter::Data data = parseData("filename.csv");  // replace "filename" with your file's name
     
     // Initalize the FindPlanet class
     DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.003, 1.0, 0.1, 2  };
