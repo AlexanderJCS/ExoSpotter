@@ -6,22 +6,6 @@
 
 namespace ExoplanetFinder
 {
-	struct Exoplanet
-	{
-		bool isPlanet = false;
-		float firstTransitDate = 0;
-		float firstFlux = 0;
-		float period = 0;
-
-		Exoplanet();  // used to return nothing if a planet is not identified
-		Exoplanet(float firstTransitDate, float flux, float period);
-
-		float findSemiMajAxis(float starSolarMasses);
-		float findRadiusRatio();
-
-		friend std::ostream& operator<<(std::ostream& strm, const ExoplanetFinder::Exoplanet& exoplanet);
-	};
-
 	struct Lightcurve
 	{
 		std::vector<float> flux;
@@ -29,6 +13,33 @@ namespace ExoplanetFinder
 
 		Lightcurve();
 		Lightcurve(std::vector<float> flux, std::vector<float> date);
+
+		Lightcurve slice(int beginIndex, int endIndex);
+	};
+
+	struct Exoplanet
+	{
+		bool isPlanet = false;
+		float averageFlux = 0;
+		float averagePeriod = 0;
+
+		Lightcurve planetDatapoints;
+
+		Exoplanet();  // used to return nothing if a planet is not identified
+		Exoplanet(Lightcurve planetDatapoints);
+
+		/*
+		Finds the planet's semi-major axis (orbital radius) given the star's solar masses.
+		*/
+		float findSemiMajAxis(float starSolarMasses);
+
+		/*
+		Finds the ratio of the planet radius / host star radius.
+		Returns -1 if the ratio cannot be found (usually due to there being no flux).
+		*/
+		float findRadiusRatio();
+
+		friend std::ostream& operator<<(std::ostream& strm, const ExoplanetFinder::Exoplanet& exoplanet);
 	};
 
 	class FindPlanet

@@ -11,7 +11,9 @@ using namespace std::chrono;
 
 int main()
 {
-	ExoplanetFinder::FindPlanet planetFinder{ readData("test/wasp-126_data.csv"), 0.9999, 0.003, 1.5, 0.2, 2 };
+	ExoplanetFinder::FindPlanet planetFinder{ 
+		readData("test/wasp-126_data.csv"), 0.9999, 0.003, 1.0, 0.1, 2 
+	};
 	
 	auto start = high_resolution_clock::now();
 	auto planets = planetFinder.findPlanets(false);
@@ -23,11 +25,11 @@ int main()
 		std::cout << "Planet " << i + 1 << ":\n" << planets[i] << "\n";
 	}
 
-	auto duration = duration_cast<milliseconds>(stop - start);
-	std::cout << "\nCompleted in " << duration.count() << " ms\n";
+	auto duration = duration_cast<microseconds>(stop - start);
+	std::cout << "\nCompleted in " << duration.count() << " microseconds\n";
 
 	start = high_resolution_clock::now();
-	planets = planetFinder.findPlanetsPrecise(true);
+	planets = planetFinder.findPlanetsPrecise(false);
 	stop = high_resolution_clock::now();
 
 	std::cout << "\n*** PRECISE ALGORITHM ***\n";
@@ -36,6 +38,6 @@ int main()
 		std::cout << "Planet " << i + 1 << ":\n" << planets[i] << "\n";
 	}
 
-	duration = duration_cast<milliseconds>(stop - start);
-	std::cout << "\nCompleted in " << duration.count() << " ms\n";
+	duration = duration_cast<microseconds>(stop - start);
+	std::cout << "\nCompleted in " << duration.count() << " microseconds\n";
 }

@@ -9,39 +9,94 @@
 ExoplanetFinder::Exoplanet::Exoplanet() { };  // called if there is no planet identified
 
 
-ExoplanetFinder::Exoplanet::Exoplanet(float firstTransitDate, float flux, float period)
+ExoplanetFinder::Exoplanet::Exoplanet(Lightcurve planetDatapoints)
 {
 	isPlanet = true;
-	this->firstTransitDate = firstTransitDate;
-	this->flux = flux;
-	this->period = period;
+	this->planetDatapoints = planetDatapoints;
+
+	float fluxAverage = 0;
+	float periodAverage = 0;
+
+	for (int i = 0; i < planetDatapoints.flux.size(); i++) {
+		fluxAverage += planetDatapoints.flux[i];
+		
+		if (i != 0) {
+			periodAverage += planetDatapoints.date[i] - planetDatapoints.date[i - 1];
+		}
+	}
+
+	fluxAverage /= planetDatapoints.flux.size();
+
+	if (planetDatapoints.date.size() != 0) {
+		periodAverage /= planetDatapoints.date.size() - 1;
+	}
+
+	this->averagePeriod = periodAverage;
+	this->averageFlux = fluxAverage;
 }
 
+
+/*
+Finds the planet's semi-major axis (orbital radius) given the star's solar masses.
+*/
 float ExoplanetFinder::Exoplanet::findSemiMajAxis(float starSolarMasses)
 {
 	// T^2 / r^3 = 1 / M (solar masses)
 	// r = cube root(M * T^2)
-	return std::cbrt(starSolarMasses * (period * period));
+	return std::cbrt(starSolarMasses * (averagePeriod * averagePeriod));
 }
 
+
+/*
+Finds the ratio of the planet radius / host star radius.
+Returns -1 if the ratio cannot be found (usually due to there being no flux).
+*/
 float ExoplanetFinder::Exoplanet::findRadiusRatio()
 {
-	return std::sqrt(1 - flux);
+	if (averageFlux > 0) {
+		return std::sqrt(1 - averageFlux);
+	}
+	
+	return -1;
 }
 
+
 std::ostream& ExoplanetFinder::operator<<(std::ostream& strm, const ExoplanetFinder::Exoplanet& exoplanet) {
-	return strm << "First observed transit date: " << exoplanet.firstTransitDate <<
-				   "\nFirst observed flux: " << exoplanet.flux <<
-				   "\nPeriod: " << exoplanet.period << " days\n";
+	return strm << "First observed transit date: " << exoplanet.planetDatapoints.date[0] <<
+				   "\nFirst observed flux: " << exoplanet.planetDatapoints.flux[0] <<
+				   "\nPeriod: " << exoplanet.averagePeriod << " days\n";
 }
 
 
 ExoplanetFinder::Lightcurve::Lightcurve() { }
 
+
 ExoplanetFinder::Lightcurve::Lightcurve(std::vector<float> flux, std::vector<float> date)
 {
 	this->flux = flux;
 	this->date = date;
+}
+
+
+ExoplanetFinder::Lightcurve ExoplanetFinder::Lightcurve::slice(int beginIndex, int endIndex)
+{
+	if (beginIndex > endIndex) {
+		return Lightcurve{};
+	}
+
+	;
+	std::vector<float> cutDate;
+
+	auto fluxBegin = this->flux.begin() + beginIndex;
+	auto fluxEnd = this->flux.begin() + endIndex + 1;
+
+	auto dateBegin = this->date.begin() + beginIndex;
+	auto dateEnd = this->date.begin() + endIndex + 1;
+	
+	std::vector<float> slicedFlux(fluxBegin, fluxEnd);
+	std::vector<float> slicedDate(dateBegin, dateEnd);
+
+	return Lightcurve{ slicedFlux, slicedDate };
 }
 
 
@@ -67,6 +122,7 @@ ExoplanetFinder::Lightcurve ExoplanetFinder::FindPlanet::findPlanetCandidates()
 
 	return planetCandidates;
 }
+
 
 /*
 Groups datapoints from the same transit into one datapoint with the peak
@@ -109,6 +165,7 @@ ExoplanetFinder::Lightcurve ExoplanetFinder::FindPlanet::groupDatapoints(Lightcu
 	return groupedData;
 }
 
+
 /*
 Splits the grouped datapoints into different unordered maps by the
 size of the planet. Used for checking if the period between the data
@@ -144,6 +201,7 @@ std::vector<ExoplanetFinder::Lightcurve> ExoplanetFinder::FindPlanet::splitDatap
 	return splitData;
 }
 
+
 /*
 Returns -1 if a planet is not found. Otherwise returns the Julian date of the first transit.
 
@@ -162,12 +220,13 @@ ExoplanetFinder::Exoplanet ExoplanetFinder::FindPlanet::planetInData(Lightcurve 
 		float transitTime2 = data.date[i + 2] - data.date[i + 1];
 
 		if (abs(transitTime2 - transitTime1) < TTVRange) {
-			return Exoplanet{ data.date[i], data.flux[i], (transitTime1 + transitTime2) / 2 };
+			return Exoplanet{ data.slice(i, i + 2)};
 		}
 	}
 
 	return Exoplanet{};
 }
+
 
 /*
 This method is to provide a more sophisticated algorithm which counteracts the
@@ -186,6 +245,7 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDat
 			float period = data.date[j] - data.date[i];
 
 			float closest = data.date[j];
+			int closestIndex = 0;
 			float nextExpectedTransit = data.date[j] + period;
 			float lastDiff = abs(closest - nextExpectedTransit);
 
@@ -198,9 +258,15 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDat
 
 				lastDiff = abs(data.date[k] - nextExpectedTransit);
 				closest = data.date[k];
+				closestIndex = k;
 			}
 
-			Exoplanet candidate = Exoplanet{ data.date[i], data.flux[i], period };
+			Exoplanet candidate = Exoplanet{ 
+				Lightcurve{ 
+					{data.flux[i], data.flux[j], data.flux[closestIndex]}, 
+					{data.date[i], data.date[j], data.date[closestIndex]}
+				}
+			};
 
 			// if the dist between the next expected transit and the closest acutal transit is
 			// less than the TTVRange, then it is a possible planet.
@@ -208,7 +274,7 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDat
 			// If more than allowedMissedTransits were missed, exclude this planet. This is to
 			// prevent noise data from being considered a real planet.
 			if (fabs(nextExpectedTransit - closest) < TTVRange && 
-				(data.date[i] - rawData.date[0]) / candidate.period < allowedMissedTransits) {
+				(data.date[i] - rawData.date[0]) / candidate.averagePeriod < allowedMissedTransits) {
 				bool broken = false;
 
 				// if the diff between the next expected transit and the closest acutal transit is
@@ -217,19 +283,19 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::planetInDat
 			// If more than allowedMissedTransits were missed, exclude this planet. This is to
 			// prevent noise data from being considered a real planet.
 				if (abs(nextExpectedTransit - closest) < TTVRange &&
-					(data.date[i] - data.date[0]) / candidate.period < allowedMissedTransits) {
+					(data.date[i] - data.date[0]) / candidate.averagePeriod < allowedMissedTransits) {
 					bool broken = false;
 
 					for (Exoplanet exoplanet : detectedExoplanets) {
 						Exoplanet& greatest = exoplanet;
 						Exoplanet& smallest = candidate;
 
-						if (candidate.period > exoplanet.period) {
+						if (candidate.averagePeriod > exoplanet.averagePeriod) {
 							greatest = candidate;
 							smallest = exoplanet;
 						}
 
-						if (abs(greatest.period - smallest.period * round(greatest.period / smallest.period)) < TTVRange) {
+						if (abs(greatest.averagePeriod - smallest.averagePeriod * round(greatest.averagePeriod / smallest.averagePeriod)) < TTVRange) {
 							broken = true;
 							break;
 						}
@@ -279,6 +345,7 @@ void ExoplanetFinder::FindPlanet::printVerbose(
 	std::cout << "\n";
 }
 
+
 /*
 Calls other methods necessary to find planets
 */
@@ -306,6 +373,7 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::findPlanets
 	return planets;
 }
 
+
 /*
 Uses a different algorithm to find more exoplanets at the expense of time
 */
@@ -329,6 +397,7 @@ std::vector<ExoplanetFinder::Exoplanet> ExoplanetFinder::FindPlanet::findPlanets
 
 	return planets;
 }
+
 
 /*
 data: The data from the observed star's brightness. It will have two key values of "flux" and "date".
