@@ -12,11 +12,17 @@ The exoplanet struct contains three main values:
 
 These values can be accessed by doing:
 ```cpp
-Exoplanet myExoplanet = ...;
+#include "include/exoplanetFinder/detectExoplanets.h"
 
-float flux = myExoplanet.averageFlux;
-float period = myExoplanet.averagePeriod;
-Lightcurve datapoints = myExoplanet.planetDatapoints;
+int main()
+{
+    ExoplanetFinder::Exoplanet myExoplanet = ...;
+
+    float flux = myExoplanet.averageFlux;
+    float period = myExoplanet.averagePeriod;
+    ExoplanetFinder::Lightcurve datapoints = myExoplanet.planetDatapoints;
+}
+
 ```
 
 # Constructor
@@ -29,13 +35,19 @@ To input data into the constructor, the Exoplanet struct only requires a `Lightc
 
 Here is an example of initializing the Exoplanet struct:
 ```cpp
+#include "include/exoplanetFinder/detectExoplanets.h"
 
-// Create a lightcurve struct to input into the Exoplanet constructor.
-// If you haven't already, see lightcurve_struct.md to understand how to
-// initalize that struct.
-ExoplanetFinder::Lightcurve planetData{ ... };
+int main()
+{
+    // Create a lightcurve struct to input into the Exoplanet constructor.
+    // If you haven't already, see lightcurve_struct.md to understand how to
+    // initalize that struct.
+    ExoplanetFinder::Lightcurve planetData{ ... };
 
-ExoplanetFinder::Exoplanet myExoplanet{ planetData };
+    ExoplanetFinder::Exoplanet myExoplanet{ planetData };
+
+    return 0;
+}
 ```
 
 ## Empty Constructor Arguments
@@ -69,12 +81,17 @@ To find the ratio between the planet's radius and the host star's radius, use th
 
 Usage looks like the following:
 ```cpp
-ExoplanetFinder::Exoplanet myExoplanet = ...;
+#include "include/exoplanetFinder/detectExoplanets.h"
 
-const float starRadius = ...  // optional: the host star's radius
-float radiusRatio = myExoplanet.findRadiusRatio();
+int main()
+{
+    ExoplanetFinder::Exoplanet myExoplanet = ...;
 
-if (radiusRatio != -1) {
-    float planetRadius = radiusRatio * starRadius;  // find the radius of the planet in the units given for starRadius
+    const float starRadius = ...  // optional: the host star's radius
+    float radiusRatio = myExoplanet.findRadiusRatio();
+
+    if (radiusRatio != -1) {
+        float planetRadius = radiusRatio * starRadius;  // find the radius of the planet in the units given for starRadius
+    }
 }
 ```
