@@ -1,30 +1,12 @@
 # exoplanet-finder
-C++ library to find exoplanets given the percieved brightness percentage (normalized flux) of a star and the Julian date of that datapoint.
-
-An example of data would look like this:
-
-```
-flux,julian_date
-0.999949689,2457801.085
-0.999966108,2457801.126
-0.999950989,2457801.168
-0.999941499,2457801.21
-```
-
-Where the left column is the normalized flux (the precieved brightness percent) and the right column is the Julian date. The date doesn't need to be the Julian date exactly, but it does need to have 1 equal to 1 Earth day.
+C++ library to find exoplanets given the percieved brightness percentage (normalized flux) of a star and the Julian date of that datapoint. This library uses the [transit method](http://www.exoplanetes.umontreal.ca/transit-method/?lang=en) to detect exoplanets.
 
 # Table of Contents
 
 ```
 0. exoplanet-finder (info about this project)
 1. Converting .fits data to .csv data
-2. Using this library in your own project
-    a. Using parseData.h to parse data
-    b. Creating the FindPlanet class
-    c. What is the Exoplanet struct?
-    d. Finding exoplanets!
-    e. Finding exoplanets-- deprecated
-3. Contributing
+2. Contributing
     a. Test tools
     b. Issues
     c. Pull requests
@@ -32,7 +14,7 @@ Where the left column is the normalized flux (the precieved brightness percent) 
 
 # Converting .fits data to .csv data
 
-First, make sure that Python 3.10 is installed on your machine as well as astropy version 3.0.4 or greater. You can install astropy by performing the command:
+First, make sure that Python 3.10 is installed on your computer as well as astropy version 3.0.4 or greater. You can install astropy by performing the command:
 ```
 $ pip install astropy
 ```
@@ -61,96 +43,7 @@ By using `parseData.h`, we can write the following code:
 
 int main()
 {
-    ExoplanetFinder::Data data = readData("filename.csv");  // replace "filename" with your file's name
-}
-```
-
-We will get a `Data` type in the output.
-
-
-## Creating the FindPlanet class
-
-To create the FindPlanet class, we need to pass in the five required input variables:
-- `Data data`: The data aquired using the last step
-- `float planetThreshold`: The minimum amount the flux can dip under for it to be considered a potential datapoint with a planet inside of it.
-- `float sizeThreshold`: The range that the flux can vary and be considered the same planet
-- `float maxTransitDurationDays`: The maximum amount of time, in days, that the transit can take.
-- `float TTVRange`: The amount of variation the period of a planet can have, in days, to be considered the same planet.
-- `int allowedMissedTransits = 2`: ***optional*** parameter which defaults to 2. This is the number of transits that cna be missed and still be counted as an exoplanet. This is made to reduce false positives in noisy data. Unless you have a specific reasion, it is recommended to keep this at 2.
-
-Using this information, we can create the planet class:
-```cpp
-#include "include/exoplanetFinder/detect_exoplanets.h"
-
-int main()
-{
-    ExoplanetFinder::Data data = parseData("filename.csv");  // define the data, read the previous section for more info
-    DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.002, 1.5, 0.4, 2 };
-}
-```
-
-## What is the Exoplanet struct?
-
-The `DetectExoplanet::Exoplanet` struct has four variables:
-- `bool isPlanet`: If the Exoplanet is detected to be a planet or if it's just junk data. This variable always be true when the struct is sent to the user.
-- `float firstTransitDate` is the date first transit the algorithm detected in the data. 
-- `float flux` is the lowest value found for the transit at `firstTransitDate`.
-- `float period` is the orbital period of the exoplanet around its host star in days.
-
-The struct is primarily used as return type of the `findPlanets()` and `findPlanetsPrecise()` methods in the `FindPlanet` class.
-You can also `cout` this class and output its values to the console in a nice, formatted way by doing `std::cout << myExoplanetStruct`.
-
-## Finding exoplanets!
-
-The last step is to use the `FindPlanet.findPlanetPrecise()` method to find the exoplanets in the dataset. This method returns a `std::vector<DetectExoplanets::Exoplanet>` object. 
-
-There is also an optional `bool verbose` argument that can be passed into this method. This is primarily used for debugging and is not recommended for production code.
-
-```cpp
-#include <iostream>
-
-#include "include/exoplanetFinder/detect_exoplanets.h"
-
-int main()
-{
-    // This code was explained in the previous section
-    ExoplanetFinder::Data data = readData("filename.csv");  // replace "filename" with your file's name
-    DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.002, 1.5, 0.4 };
-    
-    // Get the planet fluxes
-    std::vector<DetectExoplanets::Exoplanet> planetFluxes = planetFinder.findPlanetsPrecise();
-    
-    // Output the planet fluxes to the console
-    for (auto flux : planetFluxes) {
-        std::cout << flux << "\n";
-    }
-}
-```
-
-## Find exoplanets-- deprecated
-
-There is a less precise, deprecated way to find exoplanets using the `FindPlanet.findPlanets()` method. This method has an optional boolean parameter `verbose` mainly used for debugging. This is not recommended for production code. 
-
-Here is some example code:
-```cpp
-#include <iostream>
-#include <vector>
-
-#include "include/exoplanetFinder/detect_exoplanets.h"
-
-int main()
-{
-    // This code was explained in the previous section
-    ExoplanetFinder::Data data = parseData("filename.csv");  // define the data, read the previous section for more info
-    DetectExoplanets::FindPlanet planetFinder{ data, 0.9999, 0.002, 1.5, 0.4 };
-    
-    // Get the planet fluxes
-    std::vector<DetectExoplanets::Exoplanet> planetFluxes = planetFinder.findPlanets();
-    
-    // Output the planet fluxes to the console
-    for (auto& flux : planetFluxes) {
-        std::cout << flux << "\n";
-    }
+    ExoplanetFinder::Lightcurve data = readData("filename.csv");  // replace "filename" with your file's name
 }
 ```
 
