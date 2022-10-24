@@ -288,7 +288,6 @@ std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInDataPrecise(L
 
 				if (fabs(closest - nextExpectedTransit) > TTVRange * iter * 0.75) {
 					missedTransits++;
-					std::cout << "Missed transit. Closest: " << closest << " expected: " << nextExpectedTransit << "\n";
 				}
 			}
 
