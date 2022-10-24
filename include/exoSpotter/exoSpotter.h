@@ -22,10 +22,11 @@ namespace ExoSpotter
 	{
 		float averageFlux = 0;
 		float averagePeriod = 0;
+		float confidence = 0;  // value between 0 and 1
 
 		Lightcurve planetDatapoints;
 
-		Exoplanet(Lightcurve planetDatapoints);
+		Exoplanet(Lightcurve planetDatapoints, float confidence);
 
 		/*
 		Finds the planet's semi-major axis (orbital radius) given the star's solar masses.
@@ -50,6 +51,8 @@ namespace ExoSpotter
 		float maxTransitDurationDays;
 		float TTVRange;
 		int allowedMissedTransits;
+		
+		int findClosestIndex(Lightcurve data, int startIndex, float targetDate);
 
 		/*
 		Filters through the data to find datapoints under

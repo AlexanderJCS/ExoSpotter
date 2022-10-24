@@ -12,7 +12,7 @@ using namespace std::chrono;
 int main()
 {
 	ExoSpotter::FindPlanet planetFinder{ 
-		readData("test/wasp-126_data.csv"), 0.9999, 0.003, 1.0, 0.1, 2 
+		readData("test/kepler-6_data.csv"), 0.9999, 0.005, 1.2, 0.3, 2 
 	};
 
 	auto start = high_resolution_clock::now();
@@ -30,14 +30,15 @@ int main()
 	std::cout << "\nCompleted in " << duration.count() << " microseconds\n";
 
 	start = high_resolution_clock::now();
-	planets = planetFinder.findPlanetsPrecise(false);
+	planets = planetFinder.findPlanetsPrecise(true);
 	stop = high_resolution_clock::now();
 
 	std::cout << "\n*** PRECISE ALGORITHM ***\n";
 
 	for (int i = 0; i < planets.size(); i++) {
 		std::cout << "Planet " << i + 1 << ":\n" << planets[i];
-		std::cout << "Radius percent: " << planets[i].findRadiusRatio() * 100 << "%\n\n";
+		std::cout << "Radius percent: " << planets[i].findRadiusRatio() * 100 << "%\n";
+		std::cout << "Confidence: " << planets[i].confidence * 100 << "%\n\n";
 	}
 
 	duration = duration_cast<microseconds>(stop - start);

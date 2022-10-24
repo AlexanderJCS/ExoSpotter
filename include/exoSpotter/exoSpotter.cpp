@@ -44,9 +44,10 @@ ExoSpotter::Lightcurve ExoSpotter::Lightcurve::slice(int beginIndex, int endInde
 }
 
 
-ExoSpotter::Exoplanet::Exoplanet(Lightcurve planetDatapoints)
+ExoSpotter::Exoplanet::Exoplanet(Lightcurve planetDatapoints, float confidence)
 {
 	this->planetDatapoints = planetDatapoints;
+	this->confidence = confidence;
 
 	float fluxAverage = 0;
 	float periodAverage = 0;
@@ -168,6 +169,26 @@ ExoSpotter::Lightcurve ExoSpotter::FindPlanet::groupDatapoints(Lightcurve data)
 }
 
 
+int ExoSpotter::FindPlanet::findClosestIndex(Lightcurve data, int startIndex, float targetDate)
+{
+	int closestIndex = startIndex;
+	float lastDiff = abs(data.date[closestIndex] - targetDate);
+
+	// Find the datapoint closest to the next expected transit
+	for (int i = startIndex; i < data.date.size(); i++) {
+
+		if (abs(data.date[i] - targetDate) > lastDiff) {
+			break;
+		}
+
+		lastDiff = abs(data.date[i] - targetDate);
+		closestIndex = i;
+	}
+
+	return closestIndex;
+}
+
+
 /*
 Splits the grouped datapoints into different unordered maps by the
 size of the planet. Used for checking if the period between the data
@@ -222,7 +243,7 @@ std::optional<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInData(Lightc
 		float transitTime2 = data.date[i + 2] - data.date[i + 1];
 
 		if (abs(transitTime2 - transitTime1) < TTVRange) {
-			return Exoplanet{ data.slice(i, i + 2)};
+			return Exoplanet{ data.slice(i, i + 2), 1};
 		}
 	}
 
@@ -245,68 +266,66 @@ std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInDataPrecise(L
 	for (int i = 0; i < data.date.size(); i++) {
 		for (int j = i + 1; j < data.date.size(); j++) {
 			float period = data.date[j] - data.date[i];
-
-			float closest = data.date[j];
-			int closestIndex = 0;
 			float nextExpectedTransit = data.date[j] + period;
-			float lastDiff = abs(closest - nextExpectedTransit);
 
-			// Find the datapoint closest to the next expected transit
-			for (int k = j; k < data.date.size(); k++) {
-
-				if (abs(data.date[k] - nextExpectedTransit) > lastDiff) {
-					break;
-				}
-
-				lastDiff = abs(data.date[k] - nextExpectedTransit);
-				closest = data.date[k];
-				closestIndex = k;
-			}
-
-			Exoplanet candidate = Exoplanet{ 
-				Lightcurve{ 
-					{data.flux[i], data.flux[j], data.flux[closestIndex]}, 
-					{data.date[i], data.date[j], data.date[closestIndex]}
-				}
-			};
+			int closestIndex = findClosestIndex(data, j, nextExpectedTransit);
+			float closest = data.date[closestIndex];
 
 			// if the dist between the next expected transit and the closest acutal transit is
 			// less than the TTVRange, then it is a possible planet.
+			if (fabs(closest - nextExpectedTransit) > TTVRange) {
+				continue;
+			}
+
+			int expectedTransits = (data.date[data.date.size() - 1] - data.date[0]) / period;
+			int missedTransits = (data.date[i] - rawData.date[0]) / period;
+
+			for (int iter = 1; nextExpectedTransit + period < data.date[data.date.size() - 1]; iter++) {
+				nextExpectedTransit += period;
+
+				int closestIndex = findClosestIndex(data, j, nextExpectedTransit);
+				float closest = data.date[closestIndex];
+
+				if (fabs(closest - nextExpectedTransit) > TTVRange * iter * 0.75) {
+					missedTransits++;
+					std::cout << "Missed transit. Closest: " << closest << " expected: " << nextExpectedTransit << "\n";
+				}
+			}
+
+			Exoplanet candidate = Exoplanet{
+				Lightcurve{
+					{data.flux[i], data.flux[j], data.flux[closestIndex]},
+					{data.date[i], data.date[j], data.date[closestIndex]}
+				},
+
+				1 - (float)missedTransits / (float)expectedTransits
+			};
+
+			bool broken = false;
 
 			// If more than allowedMissedTransits were missed, exclude this planet. This is to
 			// prevent noise data from being considered a real planet.
-			if (fabs(nextExpectedTransit - closest) < TTVRange && 
-				(data.date[i] - rawData.date[0]) / candidate.averagePeriod < allowedMissedTransits) {
+			if ((data.date[i] - data.date[0]) / candidate.averagePeriod < allowedMissedTransits) {
 				bool broken = false;
 
-				// if the diff between the next expected transit and the closest acutal transit is
-			// less than the TTVRange, then it is a possible planet.
+				for (Exoplanet exoplanet : detectedExoplanets) {
+					Exoplanet& greatest = exoplanet;
+					Exoplanet& smallest = candidate;
 
-			// If more than allowedMissedTransits were missed, exclude this planet. This is to
-			// prevent noise data from being considered a real planet.
-				if (abs(nextExpectedTransit - closest) < TTVRange &&
-					(data.date[i] - data.date[0]) / candidate.averagePeriod < allowedMissedTransits) {
-					bool broken = false;
-
-					for (Exoplanet exoplanet : detectedExoplanets) {
-						Exoplanet& greatest = exoplanet;
-						Exoplanet& smallest = candidate;
-
-						if (candidate.averagePeriod > exoplanet.averagePeriod) {
-							greatest = candidate;
-							smallest = exoplanet;
-						}
-
-						if (abs(greatest.averagePeriod - smallest.averagePeriod * round(greatest.averagePeriod / smallest.averagePeriod)) < TTVRange) {
-							broken = true;
-							break;
-						}
+					if (candidate.averagePeriod > exoplanet.averagePeriod) {
+						greatest = candidate;
+						smallest = exoplanet;
 					}
 
-					if (!broken) {
-						detectedExoplanets.push_back(candidate);
+					if (fabs(greatest.averagePeriod - smallest.averagePeriod * round(greatest.averagePeriod / smallest.averagePeriod)) < TTVRange) {
+						broken = true;
 						break;
 					}
+				}
+
+				if (!broken) {
+					detectedExoplanets.push_back(candidate);
+					break;
 				}
 			}
 		}
