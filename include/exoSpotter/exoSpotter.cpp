@@ -43,6 +43,11 @@ ExoSpotter::Lightcurve ExoSpotter::Lightcurve::slice(int beginIndex, int endInde
 	return Lightcurve{ slicedFlux, slicedDate };
 }
 
+int ExoSpotter::Lightcurve::size()
+{
+	return flux.size();
+}
+
 
 ExoSpotter::Exoplanet::Exoplanet(Lightcurve planetDatapoints, float confidence)
 {
@@ -52,18 +57,18 @@ ExoSpotter::Exoplanet::Exoplanet(Lightcurve planetDatapoints, float confidence)
 	float fluxAverage = 0;
 	float periodAverage = 0;
 
-	for (int i = 0; i < planetDatapoints.flux.size(); i++) {
+	for (int i = 0; i < planetDatapoints.size(); i++) {
 		fluxAverage += planetDatapoints.flux[i];
-		
+
 		if (i != 0) {
 			periodAverage += planetDatapoints.date[i] - planetDatapoints.date[i - 1];
 		}
 	}
 
-	fluxAverage /= planetDatapoints.flux.size();
+	fluxAverage /= planetDatapoints.size();
 
-	if (planetDatapoints.date.size() != 0) {
-		periodAverage /= planetDatapoints.date.size() - 1;
+	if (planetDatapoints.size() != 0) {
+		periodAverage /= planetDatapoints.size() - 1;
 	}
 
 	this->averagePeriod = periodAverage;
@@ -109,7 +114,7 @@ the value potentialPlanetThreshold
 */
 ExoSpotter::Lightcurve ExoSpotter::FindPlanet::findPlanetCandidates()
 {
-	if (rawData.flux.size() != rawData.date.size()) {
+	if (rawData.size() != rawData.size()) {
 		std::cout << "Flux size is not equal to date size.";
 		exit(2);
 	}
@@ -139,7 +144,7 @@ ExoSpotter::Lightcurve ExoSpotter::FindPlanet::groupDatapoints(Lightcurve data)
 	float peakFluxDate = 0;
 	float startDate = 0;
 
-	for (int i = 0; i < data.flux.size(); i++) {
+	for (int i = 0; i < data.size(); i++) {
 		// if a new transit has occured
 		if (data.date[i] - startDate > maxTransitDurationDays) {
 			// If the values are not the default values
@@ -175,7 +180,7 @@ int ExoSpotter::FindPlanet::findClosestIndex(Lightcurve data, int startIndex, fl
 	float lastDiff = abs(data.date[closestIndex] - targetDate);
 
 	// Find the datapoint closest to the next expected transit
-	for (int i = startIndex; i < data.date.size(); i++) {
+	for (int i = startIndex; i < data.size(); i++) {
 
 		if (abs(data.date[i] - targetDate) > lastDiff) {
 			break;
@@ -198,7 +203,7 @@ std::vector<ExoSpotter::Lightcurve> ExoSpotter::FindPlanet::splitDatapoints(Ligh
 {
 	std::vector<Lightcurve> splitData;
 
-	for (int i = 0; i < data.flux.size(); i++) {
+	for (int i = 0; i < data.size(); i++) {
 		bool broken = false;
 
 		for (int j = 0; j < splitData.size(); j++) {
@@ -234,11 +239,11 @@ WARNING: This algorithm may give a false negative when two planets are in the sa
 */
 std::optional<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInData(Lightcurve data)
 {
-	if (data.flux.size() < 3) {
+	if (data.size() < 3) {
 		return { };  // not enough datapoints
 	}
 
-	for (int i = 0; i < data.date.size() - 2; i++) {
+	for (int i = 0; i < data.size() - 2; i++) {
 		float transitTime1 = data.date[i + 1] - data.date[i];
 		float transitTime2 = data.date[i + 2] - data.date[i + 1];
 
@@ -257,14 +262,14 @@ warning in the planetInData method, at the cost of time.
 */
 std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInDataPrecise(Lightcurve data)
 {
-	if (data.date.size() < 3) {
+	if (data.size() < 3) {
 		return {};
 	}
 
 	std::vector<Exoplanet> detectedExoplanets;
 
-	for (int i = 0; i < data.date.size(); i++) {
-		for (int j = i + 1; j < data.date.size(); j++) {
+	for (int i = 0; i < data.size(); i++) {
+		for (int j = i + 1; j < data.size(); j++) {
 			float period = data.date[j] - data.date[i];
 			float nextExpectedTransit = data.date[j] + period;
 
@@ -277,10 +282,10 @@ std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInDataPrecise(L
 				continue;
 			}
 
-			int expectedTransits = (data.date[data.date.size() - 1] - data.date[0]) / period;
+			int expectedTransits = (data.date[data.size() - 1] - data.date[0]) / period;
 			int missedTransits = (data.date[i] - rawData.date[0]) / period;
 
-			for (int iter = 1; nextExpectedTransit + period < data.date[data.date.size() - 1]; iter++) {
+			for (int iter = 1; nextExpectedTransit + period < data.date[data.size() - 1]; iter++) {
 				nextExpectedTransit += period;
 
 				int closestIndex = findClosestIndex(data, j, nextExpectedTransit);
@@ -338,20 +343,20 @@ void ExoSpotter::FindPlanet::printVerbose(
 {
 	std::cout << "*** Candidates ***\n\n";
 
-	for (int i = 0; i < candidates.flux.size(); i++) {
+	for (int i = 0; i < candidates.size(); i++) {
 		std::cout << candidates.flux[i] << "," << candidates.date[i] << "\n";
 	}
 
 	std::cout << "\n\n*** Grouped ***\n\n";
 
-	for (int i = 0; i < grouped.flux.size(); i++) {
+	for (int i = 0; i < grouped.size(); i++) {
 		std::cout << grouped.flux[i] << "," << grouped.date[i] << "\n";
 	}
 
 	for (int i = 0; i < splitted.size(); i++) {
 		std::cout << "\n\n*** SPLIT GROUP " << i << " ***\n\n";
 
-		for (int j = 0; j < splitted[i].flux.size(); j++) {
+		for (int j = 0; j < splitted[i].size(); j++) {
 			std::cout << splitted[i].flux[j] << "," << splitted[i].date[j] << "\n";
 		}
 	}

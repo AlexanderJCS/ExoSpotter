@@ -16,6 +16,8 @@ namespace ExoSpotter
 		Lightcurve(std::vector<float> flux, std::vector<float> date);
 
 		Lightcurve slice(int beginIndex, int endIndex);
+
+		int size();
 	};
 
 	struct Exoplanet

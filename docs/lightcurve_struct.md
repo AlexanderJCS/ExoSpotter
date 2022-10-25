@@ -27,3 +27,15 @@ ExoSpotter::Lightcurve myLightcurve{ fluxes, dates };
 ## Empty constructor
 
 The purpose of the empty Lightcurve constructor is to allow initialization of the struct without adding any values into the `flux` and `date` variables. Calling the empty constructor is effectively the same thing as running `ExoSpotter::Lightcurve myLightcurve{{}, {}}`, but it provides a more conscise way of doing so.
+
+# Size Method
+
+To get the length of the data in the Lightcurve object, use the `.size()` method. **Note that if the size of the flux vector is different than the size of the date vector, only the size of the flux vector will be given.**
+
+# Slice method
+
+The slide method takes in two arguments:
+- `beginIndex`
+- `endIndex`
+
+This method is useful for getting a portion of the full Lightcurve data.
