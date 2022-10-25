@@ -8,7 +8,7 @@ The exoplanet struct contains three main values:
 - `float averageFlux`: The average normalized flux of the planet. Normalized flux means that 1 = average brightness of the star and 0 = no light.
 - `float averagePeriod`: The average orbital period of the planet.
 - `Lightcurve planetDatapoints`: Specific datapoints the program found that signifies the exoplanet's existence.
-- `float confidence`: Percent confidence of an exoplanet between 0 and 1. **Note that "1" does not mean that it is certain to be an exoplanet, but it is more probable that it is an exoplanet.**
+- `float confidence`: Percent confidence of an exoplanet between 0 and 1. All planets found by the deprecated FindPlanet::findPlanets() will always return 1. **Note that "1" does not mean that it is certain to be an exoplanet, but it is more probable that it is an exoplanet.**
 
 These values can be accessed by doing:
 ```cpp
