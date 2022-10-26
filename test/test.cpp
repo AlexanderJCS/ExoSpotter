@@ -12,7 +12,7 @@ using namespace std::chrono;
 int main()
 {
 	ExoSpotter::FindPlanet planetFinder{ 
-		readData("test/wasp-126_data.csv"), 0.9999, 0.005, 1.2, 0.1, 2 
+		readData("test/data.csv"), 0.9999, 0.005, 1.5, 0.1, 2 
 	};
 
 	auto start = high_resolution_clock::now();

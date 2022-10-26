@@ -45,11 +45,10 @@ ExoSpotter::Lightcurve readData(std::string filename)
 			exit(1);
 		}
 
-		// Push back "flux" by the first value in the csv converted to a float
-		returnData.flux.push_back(std::stof(line.substr(0, commaIndex)));
-
-		// Same thing here but with "date"
-		returnData.date.push_back(std::stof(line.substr(commaIndex + 1)));
+		returnData.addPair(
+			std::stof(line.substr(0, commaIndex)),
+			std::stof(line.substr(commaIndex + 1))
+		);
 	}
 	
 

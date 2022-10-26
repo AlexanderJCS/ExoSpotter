@@ -9,15 +9,21 @@ namespace ExoSpotter
 {
 	struct Lightcurve
 	{
-		std::vector<float> flux;
-		std::vector<float> date;
-
-		Lightcurve();
+		Lightcurve() = default;
 		Lightcurve(std::vector<float> flux, std::vector<float> date);
 
+		std::vector<float> date() { return m_date; }
+		std::vector<float> flux() { return m_flux; }
+
+		void addPair(float flux, float date);
+		void addPair(std::vector<float> flux, std::vector<float> date);
 		Lightcurve slice(int beginIndex, int endIndex);
 
-		int size();
+		size_t size();
+
+	private:
+		std::vector<float> m_flux;
+		std::vector<float> m_date;
 	};
 
 	struct Exoplanet
@@ -26,7 +32,7 @@ namespace ExoSpotter
 		float averagePeriod = 0;
 		float confidence = 0;  // value between 0 and 1
 
-		Lightcurve planetDatapoints;
+		Lightcurve datapoints;
 
 		Exoplanet(Lightcurve planetDatapoints, float confidence);
 
