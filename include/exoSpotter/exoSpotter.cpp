@@ -241,7 +241,7 @@ std::vector<ExoSpotter::Lightcurve> ExoSpotter::FindPlanet::splitDatapoints(Ligh
 /*
 Returns a vector of all detected planets in a dataset splitted, grouped.
 */
-std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInDataPrecise(Lightcurve data)
+std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetsInData(Lightcurve data)
 {
 	if (data.size() < 3) {
 		return {};
@@ -266,6 +266,9 @@ std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInDataPrecise(L
 			int expectedTransits = (data.date()[data.size() - 1] - data.date()[0]) / period;
 			int missedTransits = (data.date()[i] - rawData.date()[0]) / period;
 
+			std::vector<float> foundTransitFluxes = { data.flux()[i], data.flux()[j], data.flux()[closestIndex] };
+			std::vector<float> foundTransitDates = { data.date()[i], data.date()[j], data.date()[closestIndex] };
+
 			for (int iter = 1; nextExpectedTransit + period < data.date()[data.size() - 1]; iter++) {
 				nextExpectedTransit += period;
 
@@ -275,13 +278,15 @@ std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInDataPrecise(L
 				if (fabs(closest - nextExpectedTransit) > TTVRange * iter * 0.75) {
 					missedTransits++;
 				}
+
+				else {
+					foundTransitFluxes.push_back(data.flux()[closestIndex]);
+					foundTransitDates.push_back(closest);
+				}
 			}
 
 			Exoplanet candidate = Exoplanet{
-				Lightcurve{
-					{data.flux()[i], data.flux()[j], data.flux()[closestIndex]},
-					{data.date()[i], data.date()[j], data.date()[closestIndex]}
-				},
+				Lightcurve{ foundTransitFluxes, foundTransitDates },
 
 				1 - (float)missedTransits / (float)expectedTransits
 			};
@@ -365,7 +370,7 @@ std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::findPlanets(bool verb
 	std::vector<Exoplanet> planets;
 
 	for (auto splitData : splitted) {
-		std::vector<Exoplanet> exoplanets = planetInDataPrecise(splitData);
+		std::vector<Exoplanet> exoplanets = planetsInData(splitData);
 
 		planets.insert(planets.end(), exoplanets.begin(), exoplanets.end());
 	}

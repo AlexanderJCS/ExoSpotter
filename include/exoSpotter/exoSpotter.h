@@ -88,7 +88,7 @@ namespace ExoSpotter
 		This method is to provide a more sophisticated algorithm which counteracts the
 		warning in the planetInData method, at the cost of time.
 		*/
-		std::vector<Exoplanet> planetInDataPrecise(Lightcurve data);
+		std::vector<Exoplanet> planetsInData(Lightcurve data);
 
 		void printVerbose(
 			Lightcurve candidates, Lightcurve grouped, std::vector<Lightcurve> splitted, std::vector<Exoplanet> planets);
