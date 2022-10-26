@@ -59,6 +59,7 @@ namespace ExoSpotter
 		float maxTransitDurationDays;
 		float TTVRange;
 		int allowedMissedTransits;
+		float minimumConfidence;
 		
 		int findClosestIndex(Lightcurve data, int startIndex, float targetDate);
 
@@ -82,15 +83,6 @@ namespace ExoSpotter
 		std::vector<Lightcurve> splitDatapoints(Lightcurve data);
 
 		/*
-		Returns a planet struct of the planet identified.
-
-		WARNING: This algorithm may give a false negative when two planets are in the same dataset.
-				 This would happen if two planets are similar size, it wouldn't get
-				 picked up by the grouping algorithm.
-		*/
-		std::optional<Exoplanet> planetInData(Lightcurve data);
-
-		/*
 		Returns a vector of all the planets found.
 
 		This method is to provide a more sophisticated algorithm which counteracts the
@@ -102,15 +94,11 @@ namespace ExoSpotter
 			Lightcurve candidates, Lightcurve grouped, std::vector<Lightcurve> splitted, std::vector<Exoplanet> planets);
 
 	public:
-		/*
-		Calls other methods necessary to find planets
-		*/
-		std::vector<Exoplanet> findPlanets(bool verbose);
 
 		/*
 		Uses a different algorithm to find more exoplanets at the expense of time
 		*/
-		std::vector<Exoplanet> findPlanetsPrecise(bool verbose = false);
+		std::vector<Exoplanet> findPlanets(bool verbose = false);
 
 		/*
 		data: The data from the observed star's brightness. It will have two key values of "flux" and "date".
@@ -125,6 +113,6 @@ namespace ExoSpotter
 		TTVRange: The amount of variation the period of a planet can have, in days, to be considered the same planet.
 		*/
 		FindPlanet(Lightcurve data, float planetThreshold, float sizeThreshold, 
-			float maxTransitDurationDays, float TTVRange, int allowedMissedTransits = 2);
+			float maxTransitDurationDays, float TTVRange, float minimumConfidence = 0.4, int allowedMissedTransits = 2);
 	};
 }

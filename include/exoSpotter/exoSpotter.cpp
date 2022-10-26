@@ -239,34 +239,7 @@ std::vector<ExoSpotter::Lightcurve> ExoSpotter::FindPlanet::splitDatapoints(Ligh
 
 
 /*
-Returns -1 if a planet is not found. Otherwise returns the Julian date of the first transit.
-
-WARNING: This algorithm may give a false negative when two planets are in the same dataset.
-		 This would happen if two planets are similar size, it wouldn't get
-		 picked up by the grouping algorithm.
-*/
-std::optional<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInData(Lightcurve data)
-{
-	if (data.size() < 3) {
-		return { };  // not enough datapoints
-	}
-
-	for (int i = 0; i < data.size() - 2; i++) {
-		float transitTime1 = data.date()[i + 1] - data.date()[i];
-		float transitTime2 = data.date()[i + 2] - data.date()[i + 1];
-
-		if (abs(transitTime2 - transitTime1) < TTVRange) {
-			return Exoplanet{ data.slice(i, i + 2), 1};
-		}
-	}
-
-	return {};
-}
-
-
-/*
-This method is to provide a more sophisticated algorithm which counteracts the
-warning in the planetInData method, at the cost of time.
+Returns a vector of all detected planets in a dataset splitted, grouped.
 */
 std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInDataPrecise(Lightcurve data)
 {
@@ -317,7 +290,8 @@ std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetInDataPrecise(L
 
 			// If more than allowedMissedTransits were missed, exclude this planet. This is to
 			// prevent noise data from being considered a real planet.
-			if ((data.date()[i] - data.date()[0]) / candidate.averagePeriod < allowedMissedTransits) {
+			if ((data.date()[i] - data.date()[0]) / candidate.averagePeriod < allowedMissedTransits &&
+				candidate.confidence >= minimumConfidence) {
 				bool broken = false;
 
 				for (Exoplanet exoplanet : detectedExoplanets) {
@@ -380,37 +354,9 @@ void ExoSpotter::FindPlanet::printVerbose(
 
 
 /*
-Calls other methods necessary to find planets
-*/
-std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::findPlanets(bool verbose)
-{
-	auto candidates = findPlanetCandidates();
-	auto grouped = groupDatapoints(candidates);
-	auto splitted = splitDatapoints(grouped);
-
-	std::vector<Exoplanet> planets;
-
-	for (auto& group : splitted) {
-		std::optional<Exoplanet> planetInfo = planetInData(group);
-
-		if (planetInfo) {
-			planets.push_back(planetInfo.value());
-		}
-	}
-	
-	// Print additional info if verbose is enabled, mainly used for debugging
-	if (verbose) {
-		printVerbose(candidates, grouped, splitted, planets);
-	}
-
-	return planets;
-}
-
-
-/*
 Uses a different algorithm to find more exoplanets at the expense of time
 */
-std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::findPlanetsPrecise(bool verbose)
+std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::findPlanets(bool verbose)
 {
 	auto candidates = findPlanetCandidates();
 	auto grouped = groupDatapoints(candidates);
@@ -445,7 +391,8 @@ maxTransitDurationDays: Used for grouping data. The amount of time, in days, tha
 TTVRange: The amount of variation the period of a planet can have, in days, to be considered the same planet.
 */
 ExoSpotter::FindPlanet::FindPlanet(Lightcurve data, float planetThreshold, 
-	float sizeThreshold, float maxTransitDurationDays, float TTVRange, int allowedMissedTransits)
+	float sizeThreshold, float maxTransitDurationDays, float TTVRange, float minimumConfidence,
+	int allowedMissedTransits)
 {
 	this->rawData = data;
 
@@ -454,4 +401,5 @@ ExoSpotter::FindPlanet::FindPlanet(Lightcurve data, float planetThreshold,
 	this->maxTransitDurationDays = maxTransitDurationDays;
 	this->TTVRange = TTVRange;
 	this->allowedMissedTransits = allowedMissedTransits;
+	this->minimumConfidence = minimumConfidence;
 }

@@ -11,7 +11,8 @@ To create the FindPlanet class, we need to pass in the six required input variab
 - `float sizeThreshold`: The range that the flux can vary and be considered the same planet
 - `float maxTransitDurationDays`: The maximum amount of time, in days, that the transit can take. **It is recommended this value is under the minimum orbital period expected, but as close to 1.0 as possible.**
 - `float TTVRange`: The amount of variation the period of a planet can have, in days, to be considered the same planet. The recommended value for this is around 0.5.
-- `int allowedMissedTransits = 2`: optional parameter which defaults to 2. This is the number of transits that cna be missed and still be counted as an exoplanet. This is made to reduce false positives in noisy data. Unless you have a specific reasion, it is recommended to keep this at 2.
+- `int allowedMissedTransits = 2`: parameter which defaults to 2 unless otherwise specified. This is the number of transits that cna be missed and still be counted as an exoplanet. This is made to reduce false positives in noisy data. Unless you have a specific reasion, it is recommended to keep this at 2.
+- `float minimumConfidence = 0.4`: parameter which defaults ot 0.4 unless otherwise specified. This is the minimum confidence the program can have in an exoplanet and still include it in the final list of planets.
 
 Using this information, we can create the planet class:
 
