@@ -24,7 +24,7 @@ Additionally, it is also recommended to view [the Lightcurve struct](docs/lightc
 
 ## Test tools
 
-Under the `test` directory, there will be a file named `test.cpp`. This file is to make sure that the code compiles and the library runs correctly. It is also recommended to replace `data.csv` with real data. In its current state, `data.csv` is a placeholder for real data.
+Under the `test` directory, there will be a file named `test.cpp`. This file is to make sure that the code compiles and the library runs correctly. To run the test, you need to [parse .fits data to csv](docs/parse_data.md).
 
 ## Issues
 
