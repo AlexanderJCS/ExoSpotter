@@ -4,10 +4,11 @@ ExoSpotter is a C++ library to find planets outside our solar system given the t
 **This library is made for C++17 and above.**
 
 To start out, it is recommended you review:
-- [how to parse data](https://github.com/AlexanderJCS/ExoSpotter/blob/main/docs/parse_data.md)
-- [the FindPlanet class](https://github.com/AlexanderJCS/ExoSpotter/blob/main/docs/find_planet_class.md)
-- [and the Exoplanet struct](https://github.com/AlexanderJCS/ExoSpotter/blob/main/docs/exoplanet_struct.md)
+- [how to parse data](docs/parse_data.md)
+- [the FindPlanet class](docs/find_planet_class.md)
+- [and the Exoplanet struct](docs/exoplanet_struct.md)
 
+Additionally, it is also recommended to view [the Lightcurve struct](docs/lightcurve_struct.md)
 
 # Table of Contents
 

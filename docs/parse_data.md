@@ -2,18 +2,15 @@
 
 First, make sure that Python 3.10 is installed on your computer as well as astropy version 3.0.4 or greater. You can install astropy by performing the command:
 ```
-$ pip install astropy
+$ python -m pip install astropy
 ```
 
-To convert lightcurve data in the style of Flexible Image Transport System (fits) data to .csv data, which can be read by the program, navigate to tools/fits_to_csv. Then, move your fits data to the same directory as the Python file. Finally, run the file and provide it all the information that is needed. If you are not sure if your flux data is normalized, assume that it isn't. The output of this program will be a file named `data.csv`, which can be fed into `parseData.h`.
+To convert lightcurve data in the style of Flexible Image Transport System (FITS) data to .csv data to be read by the program, navigate to tools/fits_to_csv. Then, move your fits data to the same directory as the Python file. Finally, run the file and provide it all the information that is needed. If you are not sure if your flux data is normalized, assume that it isn't. The output of this program will be a file named `data.csv`, which can be fed into `parseData.h`.
 
-If you want to download a direct link to a MAST URL to download TESS satellite data to test this program, do so here:
-https://archive.stsci.edu/missions/tess/tid/s0001/0000/0000/2515/5310/tess2018206045859-s0001-0000000025155310-0120-s_lc.fits
+If you want to download a direct link to a MAST URL to download TESS satellite data to test this program, do so [here](https://archive.stsci.edu/missions/tess/tid/s0001/0000/0000/2515/5310/tess2018206045859-s0001-0000000025155310-0120-s_lc.fits). This link is the MAST URL for the star WASP-126.
 
-This link is lightcurve data for the star WASP-126.
+If you want to download data for another star, follow this guide under the instructions "post-search filter" [here](https://outerspace.stsci.edu/display/TESS/6.1.6+-+Searching+For+And+Retrieving+TESS+Mission+Products).
 
-If you want to download data for another star, follow this guide under the instructions "post-search filter":
-https://outerspace.stsci.edu/display/TESS/6.1.6+-+Searching+For+And+Retrieving+TESS+Mission+Products
 
 # Converting .csv data to a Lightcurve object
 
