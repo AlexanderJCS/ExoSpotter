@@ -1,6 +1,6 @@
 # Converting .fits data to .csv
 
-First, make sure that Python 3.10 is installed on your computer as well as astropy version 3.0.4 or greater. You can install astropy by performing the command:
+First, make sure that the latest version of Python 3 is installed as well as astropy version 3.0.4 or greater. You can install astropy by performing the command:
 ```
 $ python -m pip install astropy
 ```
