@@ -28,8 +28,6 @@ namespace ExoSpotter
 
 	struct Exoplanet
 	{
-		Lightcurve datapoints;
-
 		Exoplanet(Lightcurve planetDatapoints, float confidence);
 
 		/*
@@ -45,11 +43,14 @@ namespace ExoSpotter
 
 		friend std::ostream& operator<<(std::ostream& strm, const ExoSpotter::Exoplanet& exoplanet);
 
+		Lightcurve datapoints() { return m_datapoints; }
 		float averageFlux() { return m_averageFlux; }
 		float averagePeriod() { return m_averagePeriod; }
 		float confidence() { return m_confidence; }
 
 	private:
+		Lightcurve m_datapoints;
+
 		float m_averageFlux = 0;
 		float m_averagePeriod = 0;
 		float m_confidence = 0;  // value between 0 and 1

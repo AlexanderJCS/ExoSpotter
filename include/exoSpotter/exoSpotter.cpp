@@ -63,7 +63,7 @@ size_t ExoSpotter::Lightcurve::size()
 
 ExoSpotter::Exoplanet::Exoplanet(Lightcurve planetDatapoints, float confidence)
 {
-	this->datapoints = planetDatapoints;
+	this->m_datapoints = planetDatapoints;
 	this->m_confidence = confidence;
 
 	float fluxAverage = 0;
@@ -116,8 +116,8 @@ float ExoSpotter::Exoplanet::findRadiusRatio()
 std::ostream& ExoSpotter::operator<<(std::ostream& strm, const ExoSpotter::Exoplanet& exoplanet) {
 	Exoplanet planet = exoplanet;
 	
-	return strm << "First observed transit date: " << planet.datapoints.date()[0] <<
-				   "\nFirst observed flux: " << planet.datapoints.flux()[0] <<
+	return strm << "First observed transit date: " << planet.datapoints().date()[0] <<
+				   "\nFirst observed flux: " << planet.datapoints().flux()[0] <<
 				   "\nAverage flux: " << planet.m_averageFlux <<
 				   "\nPeriod: " << planet.m_averagePeriod << " days\n";
 }
