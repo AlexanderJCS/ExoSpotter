@@ -51,25 +51,29 @@ def remove_nan(dates: list, fluxes: list) -> tuple:
 
 def main():
     print(f"{INFO}\n")
-    filename = input("Please input the .fits data's filename or path (file extension needs to be included): ")
-    normalized = input("Is the data normalized (where 1 = average flux, 0 = no light)? (y/n): ")
 
-    normalized = normalized.lower() in ("y", "yes")
+    while True:
+        filename = input("Please input the .fits data's filename or path (file extension needs to be included): ")
 
-    with fits.open(filename, mode="readonly") as hdulist:
-        tess_bjds = hdulist[1].data['TIME']
-        pdcsap_fluxes = hdulist[1].data['PDCSAP_FLUX']
+        try:
+            with fits.open(filename, mode="readonly") as hdulist:
+                tess_bjds = hdulist[1].data['TIME']
+                pdcsap_fluxes = hdulist[1].data['PDCSAP_FLUX']
+
+        except FileNotFoundError:
+            print(f"The file {filename} is not found. Make sure that the file"
+                  f" extension and capitalization is correct and try again.\n")
+
+        else:
+            break
 
     if len(tess_bjds) != len(pdcsap_fluxes):
         raise IndexError(
-            f"Length of date data is {tess_bjds}, which is not equal to length of fluxes ({pdcsap_fluxes})"
+            f"Length of date data is {len(tess_bjds)}, which is not equal to length of fluxes ({len(pdcsap_fluxes)})"
         )
 
     tess_bjds, pdcsap_fluxes = remove_nan(tess_bjds, pdcsap_fluxes)
-
-    # Normalize the data if it is not already normalized
-    if not normalized:
-        pdcsap_fluxes = normalize_data(pdcsap_fluxes)
+    pdcsap_fluxes = normalize_data(pdcsap_fluxes)  # normalize the data so 0 = no light and 1 = average
 
     # Write the data to filename data.csv
     with open("data.csv", "w") as f:
