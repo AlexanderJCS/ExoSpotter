@@ -28,10 +28,6 @@ namespace ExoSpotter
 
 	struct Exoplanet
 	{
-		float averageFlux = 0;
-		float averagePeriod = 0;
-		float confidence = 0;  // value between 0 and 1
-
 		Lightcurve datapoints;
 
 		Exoplanet(Lightcurve planetDatapoints, float confidence);
@@ -48,6 +44,15 @@ namespace ExoSpotter
 		float findRadiusRatio();
 
 		friend std::ostream& operator<<(std::ostream& strm, const ExoSpotter::Exoplanet& exoplanet);
+
+		float averageFlux() { return m_averageFlux; }
+		float averagePeriod() { return m_averagePeriod; }
+		float confidence() { return m_confidence; }
+
+	private:
+		float m_averageFlux = 0;
+		float m_averagePeriod = 0;
+		float m_confidence = 0;  // value between 0 and 1
 	};
 
 	class FindPlanet
@@ -58,7 +63,6 @@ namespace ExoSpotter
 		float samePlanetSizeThreshold;
 		float maxTransitDurationDays;
 		float TTVRange;
-		int allowedMissedTransits;
 		float minimumConfidence;
 		
 		int findClosestIndex(Lightcurve data, int startIndex, float targetDate);
@@ -113,6 +117,6 @@ namespace ExoSpotter
 		TTVRange: The amount of variation the period of a planet can have, in days, to be considered the same planet.
 		*/
 		FindPlanet(Lightcurve data, float planetThreshold, float sizeThreshold, 
-			float maxTransitDurationDays, float TTVRange, float minimumConfidence = 0.4, int allowedMissedTransits = 2);
+			float maxTransitDurationDays, float TTVRange, float minimumConfidence = 0.4);
 	};
 }

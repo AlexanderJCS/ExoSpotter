@@ -64,7 +64,7 @@ size_t ExoSpotter::Lightcurve::size()
 ExoSpotter::Exoplanet::Exoplanet(Lightcurve planetDatapoints, float confidence)
 {
 	this->datapoints = planetDatapoints;
-	this->confidence = confidence;
+	this->m_confidence = confidence;
 
 	float fluxAverage = 0;
 	float periodAverage = 0;
@@ -83,8 +83,8 @@ ExoSpotter::Exoplanet::Exoplanet(Lightcurve planetDatapoints, float confidence)
 		periodAverage /= planetDatapoints.size() - 1;
 	}
 
-	this->averagePeriod = periodAverage;
-	this->averageFlux = fluxAverage;
+	this->m_averagePeriod = periodAverage;
+	this->m_averageFlux = fluxAverage;
 }
 
 
@@ -95,7 +95,7 @@ float ExoSpotter::Exoplanet::findSemiMajAxis(float starSolarMasses)
 {
 	// T^2 / r^3 = 1 / M (solar masses)
 	// r = cube root(M * T^2)
-	return std::cbrt(starSolarMasses * (averagePeriod * averagePeriod));
+	return std::cbrt(starSolarMasses * (m_averagePeriod * m_averagePeriod));
 }
 
 
@@ -105,8 +105,8 @@ Returns -1 if the ratio cannot be found (usually due to there being no flux).
 */
 float ExoSpotter::Exoplanet::findRadiusRatio()
 {
-	if (averageFlux > 0) {
-		return std::sqrt(1 - averageFlux);
+	if (m_averageFlux > 0) {
+		return std::sqrt(1 - m_averageFlux);
 	}
 	
 	return -1;
@@ -118,8 +118,8 @@ std::ostream& ExoSpotter::operator<<(std::ostream& strm, const ExoSpotter::Exopl
 	
 	return strm << "First observed transit date: " << planet.datapoints.date()[0] <<
 				   "\nFirst observed flux: " << planet.datapoints.flux()[0] <<
-				   "\nAverage flux: " << planet.averageFlux <<
-				   "\nPeriod: " << planet.averagePeriod << " days\n";
+				   "\nAverage flux: " << planet.m_averageFlux <<
+				   "\nPeriod: " << planet.m_averagePeriod << " days\n";
 }
 
 
@@ -295,20 +295,19 @@ std::vector<ExoSpotter::Exoplanet> ExoSpotter::FindPlanet::planetsInData(Lightcu
 
 			// If more than allowedMissedTransits were missed, exclude this planet. This is to
 			// prevent noise data from being considered a real planet.
-			if ((data.date()[i] - data.date()[0]) / candidate.averagePeriod < allowedMissedTransits &&
-				candidate.confidence >= minimumConfidence) {
+			if (candidate.confidence() >= minimumConfidence) {
 				bool broken = false;
 
 				for (Exoplanet exoplanet : detectedExoplanets) {
 					Exoplanet& greatest = exoplanet;
 					Exoplanet& smallest = candidate;
 
-					if (candidate.averagePeriod > exoplanet.averagePeriod) {
+					if (candidate.averagePeriod() > exoplanet.averagePeriod()) {
 						greatest = candidate;
 						smallest = exoplanet;
 					}
 
-					if (fabs(greatest.averagePeriod - smallest.averagePeriod * round(greatest.averagePeriod / smallest.averagePeriod)) < TTVRange) {
+					if (fabs(greatest.averagePeriod() - smallest.averagePeriod() * round(greatest.averagePeriod() / smallest.averagePeriod())) < TTVRange) {
 						broken = true;
 						break;
 					}
@@ -396,8 +395,7 @@ maxTransitDurationDays: Used for grouping data. The amount of time, in days, tha
 TTVRange: The amount of variation the period of a planet can have, in days, to be considered the same planet.
 */
 ExoSpotter::FindPlanet::FindPlanet(Lightcurve data, float planetThreshold, 
-	float sizeThreshold, float maxTransitDurationDays, float TTVRange, float minimumConfidence,
-	int allowedMissedTransits)
+	float sizeThreshold, float maxTransitDurationDays, float TTVRange, float minimumConfidence)
 {
 	this->rawData = data;
 
@@ -405,6 +403,5 @@ ExoSpotter::FindPlanet::FindPlanet(Lightcurve data, float planetThreshold,
 	samePlanetSizeThreshold = sizeThreshold;
 	this->maxTransitDurationDays = maxTransitDurationDays;
 	this->TTVRange = TTVRange;
-	this->allowedMissedTransits = allowedMissedTransits;
 	this->minimumConfidence = minimumConfidence;
 }
