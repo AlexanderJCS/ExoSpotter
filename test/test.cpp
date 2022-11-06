@@ -6,7 +6,13 @@
 #include "../include/exoSpotter/exoSpotter.h"
 #include "../include/exoSpotter/parseData.h"
 
+#include "findPlanetTest.h"
+#include "benchmarkTest.h"
+
+
 using namespace std::chrono;
+
+const unsigned int timedTestRuns = 100;
 
 
 int main()
@@ -15,24 +21,10 @@ int main()
 		readData("test/wasp-126_data.csv"), 0.9999, 0.005, 1.5, 0.1, 0.5
 	};
 
-	auto start = high_resolution_clock::now();
-	auto planets = planetFinder.findPlanets(false);
-	auto stop = high_resolution_clock::now();
+	std::cout << "*** FIND PLANETS TEST ***\n";
+	findPlanetTest(planetFinder);
 
-	for (int i = 0; i < planets.size(); i++) {
-		std::cout << "Planet " << i + 1 << ":\n" << planets[i];
-		std::cout << "Radius percent: " << planets[i].findRadiusRatio() * 100 << "%\n";
-		std::cout << "Confidence: " << planets[i].confidence() * 100 << "%\n\n";
-		
-		std::cout << "\nDatapoints:\n";
-
-		for (int j = 0; j < planets[i].datapoints.size(); j++) {
-			std::cout << planets[i].datapoints.flux()[j] << ", " << planets[i].datapoints.date()[j] << "\n";
-		}
-
-		std::cout << "\n";
-	}
-
-	auto duration = duration_cast<milliseconds>(stop - start);
-	std::cout << "\nCompleted in " << duration.count() << " milliseconds\n";
+	std::cout << "*** BENCHMARKING ***\n";
+	std::cout << "Performing benchmark test. Please wait.\n";
+	benchmark(planetFinder, timedTestRuns);
 }
