@@ -4,9 +4,9 @@
 #include "findPlanetTest.h"
 
 
-void findPlanetTest(ExoSpotter::FindPlanet planetFinder)
+void findPlanetTest(ExoSpotter::FindPlanet planetFinder, bool verbose)
 {
-	auto planets = planetFinder.findPlanets(false);
+	auto planets = planetFinder.findPlanets(verbose);
 
 	for (int i = 0; i < planets.size(); i++) {
 		std::cout << "Planet " << i + 1 << ":\n" << planets[i];
