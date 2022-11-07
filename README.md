@@ -1,4 +1,4 @@
-# exoplanet-finder
+# ExoSpotter
 ExoSpotter is a C++ library to find planets outside our solar system given the time-series data of the percieved brightness (flux) of a star. This library uses the [transit method](http://www.exoplanetes.umontreal.ca/transit-method/?lang=en) to detect exoplanets.
 
 **This library is made for C++17 and above.**
