@@ -6,7 +6,7 @@ The lightcurve struct stores [light curve](https://en.wikipedia.org/wiki/Light_c
 
 # Lightcurve constructor
 
-Understanding how the lightcurve constructor is not essential for using this library, but it is essentiatl for modifying source code.
+Understanding how the lightcurve constructor is not essential for using this library, but it is important when modifying source code.
 
 ## Non-empty constructor
 
@@ -29,7 +29,7 @@ The purpose of the empty Lightcurve constructor is to allow initialization of th
 
 ## Getting Flux
 
-To get a vector of all the fluxes, use the `.flux()` method. Usage looks like so:
+To get a vector of all the flux data, use the `.flux()` method. Usage looks like so:
 ```cpp
 ExoSpotter::Lightcurve my_lc = ...;
 

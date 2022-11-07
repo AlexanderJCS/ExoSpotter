@@ -4,7 +4,7 @@ The `Exoplanet` struct is used as the return value of the `FindPlanet` class. It
 
 # Data contained in the Exoplanet struct
 
-The exoplanet struct contains four main getter methods:
+The Exoplanet struct contains four main getter methods:
 - `float averageFlux()`: The average normalized flux of the planet. Normalized flux means that 1 = average brightness of the star and 0 = no light is reaching the sensor.
 - `float averagePeriod()`: The average orbital period of the planet.
 - `Lightcurve datapoints()`: Specific datapoints the program found from the planet.
@@ -39,7 +39,7 @@ int main()
     const float starRadius = ...  // optional: the host star's radius
     float radiusRatio = myExoplanet.findRadiusRatio();
 
-    if (radiusRatio != -1) {
+    if (radiusRatio != -1) {  // if there is no issue
         float planetRadius = radiusRatio * starRadius;  // find the radius of the planet in the units given for starRadius
     }
 }
@@ -58,8 +58,8 @@ Here is an example of initializing the Exoplanet struct:
 int main()
 {
     // Create a lightcurve struct to input into the Exoplanet constructor.
-    // If you haven't already, see lightcurve_struct.md to understand how to
-    // initalize that struct.
+    // If you haven't already, see parse_data.md to understand how to
+    // parse data into a Lightcurve struct.
     ExoSpotter::Lightcurve planetData{ ... };
 
     ExoSpotter::Exoplanet myExoplanet{ planetData };

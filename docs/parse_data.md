@@ -22,6 +22,6 @@ By using `parseData.h`, we can write the following code:
 
 int main()
 {
-    ExoSpotter::Lightcurve data = readData("filename.csv");  // replace "filename" with your file's name
+    ExoSpotter::Lightcurve data = ExoSpotter::readData("filename.csv");  // replace "filename" with your file's name
 }
 ```
