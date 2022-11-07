@@ -10,21 +10,17 @@ To start out, it is recommended you review:
 
 Additionally, it is also recommended to view [the Lightcurve struct](docs/lightcurve_struct.md)
 
-# Table of Contents
+# Screenshots
 
-```
-1. exoplanet-finder (info about this project)
-2. Contributing
-    a. Test tools
-    b. Issues
-    c. Pull requests
-````
+The program identifying WASP 126-b and WASP 126-c using TESS lightcurve data:
+![image](https://user-images.githubusercontent.com/98898166/200208273-1ac28f31-9c93-4077-860e-0b6d323113a9.png)
+
 
 # Contributing
 
 ## Test tools
 
-Under the `test` directory, there will be a file named `test.cpp`. This file is to make sure that the code compiles and the library runs correctly. To run the test, you need to [parse .fits data to csv](docs/parse_data.md).
+Under the `test` directory, there will be a file named `test.cpp`. This file is to make sure that the code compiles and the library runs correctly. To run the test, you need to [parse .fits data to csv to be read by the program](docs/parse_data.md).
 
 ## Issues
 
