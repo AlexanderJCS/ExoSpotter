@@ -17,7 +17,7 @@ double Timer::time()
 	auto now = std::chrono::high_resolution_clock::now();
 	auto time = std::chrono::duration_cast<std::chrono::microseconds>(now - start);
 
-	return time.count() / 1000;
+	return (double) time.count() / 1000;
 }
 
 

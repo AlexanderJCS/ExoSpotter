@@ -12,7 +12,7 @@
 
 using namespace std::chrono;
 
-const unsigned int timedTestRuns = 100;
+const unsigned int timedTestRuns = 50000;
 
 
 int main()

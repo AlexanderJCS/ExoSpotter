@@ -12,8 +12,8 @@ namespace ExoSpotter
 		Lightcurve() = default;
 		Lightcurve(std::vector<float> flux, std::vector<float> date);
 
-		std::vector<float> date() { return m_date; }
-		std::vector<float> flux() { return m_flux; }
+		const std::vector<float>& date() { return m_date; }
+		const std::vector<float>& flux() { return m_flux; }
 
 		void addPair(float flux, float date);
 		void addPair(std::vector<float> flux, std::vector<float> date);

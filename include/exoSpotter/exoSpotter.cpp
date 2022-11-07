@@ -129,20 +129,17 @@ the value potentialPlanetThreshold
 */
 ExoSpotter::Lightcurve ExoSpotter::FindPlanet::findPlanetCandidates()
 {
-	if (rawData.size() != rawData.size()) {
-		std::cout << "Flux size is not equal to date size.";
-		exit(2);
-	}
-
-	Lightcurve planetCandidates;
+	std::vector<float> flux;
+	std::vector<float> date;
 
 	for (int i = 0; i < rawData.size(); i++) {
 		if (rawData.flux()[i] <= potentialPlanetThreshold) {
-			planetCandidates.addPair(rawData.flux()[i], rawData.date()[i]);
+			flux.push_back(rawData.flux()[i]);
+			date.push_back(rawData.date()[i]);
 		}
 	}
 
-	return planetCandidates;
+	return {flux, date};
 }
 
 
